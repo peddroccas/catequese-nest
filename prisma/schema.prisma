@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  COORDINATOR
+  MEMBER
+}
+
+model Catechist {
+  id       String   @id @default(uuid())
+  name     String
+  nickname String   @default("")
+  role     Role     @default(MEMBER)
+  birthday DateTime
+  phone    String
+  address  String
+
+  hasReceivedBaptism      Boolean
+  hasReceivedEucharist    Boolean
+  hasReceivedConfirmation Boolean
+  hasReceivedMarriage     Boolean?
+
+  email         String? @unique
+  password_hash String?
+
+  classroom   Classroom? @relation(fields: [classroomId], references: [id])
+  classroomId String?
+
+  @@map("catechists")
+}
+
+model Catechizing {
+  id                     String   @id @default(uuid())
+  name                   String
+  birthday               DateTime
+  address                String
+  personWithSpecialNeeds Boolean?
+
+  hasReceivedBaptism   Boolean
+  hasReceivedEucharist Boolean
+  hasReceivedMarriage  Boolean @default(false)
+
+  payments Payment[]
+  parents  Parent[]
+
+  classroom   Classroom? @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  classroomId String?
+
+  @@map("catechizings")
+}
+
+model Parent {
+  id      String @id @default(uuid())
+  name    String
+  phone   String
+  kinship String
+
+  catechizing   Catechizing @relation(fields: [catechizingId], references: [id], onDelete: Cascade)
+  catechizingId String      @unique
+
+  @@map("parents")
+}
+
+model Classroom {
+  id         String  @id @default(uuid())
+  roomNumber Decimal @unique
+  segment    String
+  startedAt  Int
+
+  catechists   Catechist[]
+  catechizings Catechizing[]
+
+  @@map("classrooms")
+}
+
+model Payment {
+  id                String  @id @default(uuid())
+  toBePaid          Float   @default(350)
+  hasReceivedTicket Boolean @default(false)
+
+  catechizing   Catechizing @relation(fields: [catechizingId], references: [id], onDelete: Cascade)
+  catechizingId String      @unique
+
+  installments Installment[]
+
+  @@map("payments")
+}
+
+model Installment {
+  id      String   @id @default(uuid())
+  payedAt DateTime @default(now())
+  value   Float
+
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  paymentId String
+
+  @@map("installments")
+}

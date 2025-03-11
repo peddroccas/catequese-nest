@@ -1,0 +1,25 @@
+services:
+  catequese-db:
+    image: bitnami/postgresql:latest
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=catequese
+      - POSTGRES_PASSWORD=aparecida
+      - POSTGRES_DB=catequesedb
+    volumes:
+      - catequese-pg:/bitnami/postgresql
+
+  # catequese-api:
+  #   build: .
+  #   ports:
+  #     - '3333:3333'
+  #   environment:
+  #     - JWT_SECRET=${JWT_SECRET}
+  #     - DATABASE_URL=${DATABASE_URL}
+  #   depends_on:
+  #     - catequese-db
+  #   restart: always
+    
+volumes:
+    catequese-pg:
