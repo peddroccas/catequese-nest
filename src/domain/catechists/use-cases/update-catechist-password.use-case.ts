@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { HashGenerator } from '../cryptography/hash-generator'
 import { left, right } from '@/core/either'
-import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { CatechistRepository } from '../repositories/catechist.repository'
 import { UpdateCatechistPasswordRequestDto } from '../dto/request/update-catechist-password.dto'
 import { UpdateCatechistResponseDto } from '../dto/response/update-catechist.dto'
