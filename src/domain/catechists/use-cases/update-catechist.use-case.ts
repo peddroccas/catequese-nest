@@ -7,16 +7,20 @@ import { left, right } from '@/core/either'
 import { WrongCredentialsError } from './errors/wrog-credentials-error'
 import { Catechist } from '../entities/catechist'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { UpdateCatechistRequestDto } from '../dto/request/update-catechist.dto'
+import { UpdateCatechistResponseDto } from '../dto/response/update-catechist.dto'
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
+import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 
 @Injectable()
-export class CreateCatechistUseCase {
+export class UpdateCatechistUseCase {
   constructor(
     private catechistRepository: CatechistRepository,
     private hashGenerator: HashGenerator
   ) {}
 
   async execute({
+    id,
     address,
     birthday,
     email,
@@ -29,15 +33,20 @@ export class CreateCatechistUseCase {
     phone,
     role,
     classroomId,
-  }: CreateCatechistRequestDto): Promise<CreateCatechistResponseDto> {
+  }: UpdateCatechistRequestDto): Promise<UpdateCatechistResponseDto> {
+    const currentCatechist = await this.catechistRepository.findById(id)
+
+    if (!currentCatechist) {
+      return left(new ResourceNotFoundError())
+    }
+
     const hasCatechistWithEmail =
-      await this.catechistRepository.checkDuplicatedCredentials(email)
+      await this.catechistRepository.checkDuplicatedCredentials(email, id)
 
     if (hasCatechistWithEmail) {
       return left(new DuplicatedError())
     }
 
-    const hashedPassword = await this.hashGenerator.hash('123456')
     const catechist = Catechist.create(
       {
         address,
@@ -51,14 +60,14 @@ export class CreateCatechistUseCase {
         nickname,
         phone,
         role,
-        password_hash: hashedPassword,
+        password_hash: currentCatechist.passwordHash,
         classroomId,
       },
-      new UniqueEntityID()
+      currentCatechist.id
     )
 
-    await this.catechistRepository.create(catechist)
+    await this.catechistRepository.update(catechist)
 
-    return right({ catechist })
+    return right(null)
   }
 }
