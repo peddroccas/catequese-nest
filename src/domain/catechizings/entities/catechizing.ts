@@ -13,6 +13,7 @@ export interface CatechizingProps {
   hasReceivedEucharist: boolean
   hasReceivedMarriage: boolean
 
+  classroomId?: UniqueEntityID
   parents: Parent[]
   payment: Payment
 }

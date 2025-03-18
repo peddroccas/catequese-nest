@@ -76,7 +76,7 @@ model Parent {
 
 model Classroom {
   id         String  @id @default(uuid())
-  roomNumber Decimal @unique
+  roomNumber Decimal
   segment    String
   startedAt  Int
 

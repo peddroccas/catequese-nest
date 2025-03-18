@@ -51,7 +51,7 @@ export class CreateCatechistUseCase {
         phone,
         role,
         password_hash: hashedPassword,
-        classroomId,
+        classroomId: new UniqueEntityID(classroomId),
       },
       new UniqueEntityID()
     )

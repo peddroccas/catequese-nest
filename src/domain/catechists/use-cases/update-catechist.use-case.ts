@@ -7,6 +7,7 @@ import { UpdateCatechistRequestDto } from '../dto/request/update-catechist.dto'
 import { UpdateCatechistResponseDto } from '../dto/response/update-catechist.dto'
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 @Injectable()
 export class UpdateCatechistUseCase {
@@ -57,7 +58,7 @@ export class UpdateCatechistUseCase {
         phone,
         role,
         password_hash: currentCatechist.passwordHash,
-        classroomId,
+        classroomId: new UniqueEntityID(classroomId),
       },
       currentCatechist.id
     )
