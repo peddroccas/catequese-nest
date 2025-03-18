@@ -48,7 +48,6 @@ model Catechizing {
   address                String
   personWithSpecialNeeds Boolean?
   releasedToGoAwayAlone  Boolean  @default(false)
-  hasRecievedCheckbook   Boolean  @default(false)
 
   hasReceivedBaptism   Boolean
   hasReceivedEucharist Boolean
@@ -88,8 +87,9 @@ model Classroom {
 }
 
 model Payment {
-  id       String @id @default(uuid())
-  toBePaid Float
+  id                 String  @id @default(uuid())
+  toBePaid           Float
+  hasReceivedBooklet Boolean @default(false)
 
   catechizing   Catechizing @relation(fields: [catechizingId], references: [id], onDelete: Cascade)
   catechizingId String      @unique
