@@ -6,6 +6,7 @@ export abstract class ParentRepository {
   abstract create(parent: Parent): Promise<Parent>
   abstract delete(id: string): Promise<void>
   abstract findById(id: string): Promise<Parent | null>
+  abstract findByCatechizing(catechizigId: string): Promise<Parent | null>
   abstract findMany(): Promise<Parent[]>
   abstract update(parent: Parent): Promise<Parent>
 }
