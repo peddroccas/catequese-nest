@@ -4,8 +4,8 @@ import { Encrypter } from '../cryptography/encrypter'
 import { left, right } from '@/core/either'
 import { CatechistRepository } from '../repositories/catechist.repository'
 import { WrongCredentialsError } from './errors/wrog-credentials-error'
-import { AuthenticateCatechistRequestDto } from '../dto/request/authenticate-catechist.dto'
-import { AuthenticateCatechistResponseDto } from '../dto/response/authenticate-catechist.dto'
+import { AuthenticateCatechistRequestDto } from '../dtos/request/authenticate-catechist.dto'
+import { AuthenticateCatechistResponseDto } from '../dtos/response/authenticate-catechist.dto'
 
 @Injectable()
 export class AuthenticateCatechistUseCase {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { CatechistRepository } from '../repositories/catechist.repository'
 import { right } from '@/core/either'
-import { FetchAllCatechistResponseDto } from '../dto/response/fetch-all-catechist.dto'
+import { FetchAllCatechistResponseDto } from '../dtos/response/fetch-all-catechist.dto'
 
 @Injectable()
 export class FetchAllCatechistUseCase {

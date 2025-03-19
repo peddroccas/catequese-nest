@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { CatechistRepository } from '../repositories/catechist.repository'
 import { left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
-import { DeleteCatechistResponseDto } from '../dto/response/delete-catechist.dto'
+import { DeleteCatechistResponseDto } from '../dtos/response/delete-catechist.dto'
 
 @Injectable()
 export class DeleteCatechistUseCase {
