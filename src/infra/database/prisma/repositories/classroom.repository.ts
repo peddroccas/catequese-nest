@@ -30,7 +30,30 @@ export class PrismaClassroomRepository implements ClassroomRepository {
     const response = await this.db.classroom.findUnique({
       where: { id },
       select: {
-        catechizings: { select: { payments: true, parents: true } },
+        catechizings: {
+          select: {
+            address: true,
+            birthday: true,
+            classroomId: true,
+            hasReceivedBaptism: true,
+            hasReceivedEucharist: true,
+            hasReceivedMarriage: true,
+            id: true,
+            name: true,
+            personWithSpecialNeeds: true,
+            releasedToGoAwayAlone: true,
+            payments: {
+              select: {
+                catechizingId: true,
+                id: true,
+                hasReceivedBooklet: true,
+                toBePaid: true,
+                installments: true,
+              },
+            },
+            parents: true,
+          },
+        },
         id: true,
         segment: true,
         startedAt: true,
