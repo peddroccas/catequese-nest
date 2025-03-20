@@ -13,7 +13,7 @@ import { Parent } from '../entities/parent'
 import { UpdateParentResponseDto } from '../dtos/response/update-parent.dto'
 
 @Injectable()
-export class UpdateCatechizingUseCase {
+export class UpdateParentUseCase {
   constructor(private parentRepository: ParentRepository) {}
 
   async execute({
@@ -34,6 +34,8 @@ export class UpdateCatechizingUseCase {
       phone,
       kinship,
     })
+
+    await this.parentRepository.update(parent)
 
     return right({ parent })
   }
