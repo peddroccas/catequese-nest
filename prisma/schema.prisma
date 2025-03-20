@@ -30,10 +30,10 @@ model Catechist {
   hasReceivedBaptism      Boolean
   hasReceivedEucharist    Boolean
   hasReceivedConfirmation Boolean
-  hasReceivedMarriage     Boolean?
+  hasReceivedMarriage     Boolean
 
-  email         String? @unique
-  password_hash String?
+  email         String @unique
+  password_hash String
 
   classroom   Classroom? @relation(fields: [classroomId], references: [id])
   classroomId String?
@@ -46,7 +46,7 @@ model Catechizing {
   name                   String
   birthday               DateTime
   address                String
-  personWithSpecialNeeds Boolean?
+  personWithSpecialNeeds Boolean
   releasedToGoAwayAlone  Boolean  @default(false)
 
   hasReceivedBaptism   Boolean
@@ -57,7 +57,7 @@ model Catechizing {
   parents  Parent[]
 
   classroom   Classroom? @relation(fields: [classroomId], references: [id], onDelete: Cascade)
-  classroomId String?
+  classroomId String
 
   @@map("catechizings")
 }

@@ -1,10 +1,22 @@
 import { Injectable } from '@nestjs/common'
 import type { PrismaService } from '../prisma.service'
 import type { Catechist, Prisma } from '@prisma/client'
+import { CatechistRepository } from '@/domain/catechists/repositories/catechist.repository'
+import { Catechist } from '@/domain/catechists/entities/catechist'
 
 @Injectable()
-export class CatechistRepository {
+export class PrismaCatechistRepository implements CatechistRepository {
   constructor(private db: PrismaService) {}
+
+  checkDuplicatedCredentials(email: string, id?: string): Promise<boolean> {
+    throw new Error('Method not implemented.')
+  }
+  findByClassroom(classroomId: string): Promise<Catechist[]> {
+    throw new Error('Method not implemented.')
+  }
+  findMany(): Promise<Catechist[]> {
+    throw new Error('Method not implemented.')
+  }
 
   async create(catechist: Prisma.CatechistCreateInput): Promise<Catechist> {
     return await this.db.catechist.create({ data: catechist })
