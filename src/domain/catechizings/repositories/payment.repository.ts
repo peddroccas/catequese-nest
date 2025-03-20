@@ -5,4 +5,5 @@ import { Payment } from '../entities/payment'
 export abstract class PaymentRepository {
   abstract findById(id: string): Promise<Payment | null>
   abstract findByCatechizing(catechizingId: string): Promise<Payment>
+  abstract updateToBePaid(id: string, value: number): Promise<void>
 }
