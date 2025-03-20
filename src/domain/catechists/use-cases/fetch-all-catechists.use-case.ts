@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { CatechistRepository } from '../repositories/catechist.repository'
 import { right } from '@/core/either'
-import { FetchAllCatechistResponseDto } from '../dtos/response/fetch-all-catechist.dto'
+import { FetchAllCatechistsResponseDto } from '../dtos/response/fetch-all-catechist.dto'
 
 @Injectable()
-export class FetchAllCatechistUseCase {
+export class FetchAllCatechistsUseCase {
   constructor(private catechistRepository: CatechistRepository) {}
 
-  async execute(): Promise<FetchAllCatechistResponseDto> {
+  async execute(): Promise<FetchAllCatechistsResponseDto> {
     const catechists = await this.catechistRepository.findMany()
 
     return right({ catechists })
