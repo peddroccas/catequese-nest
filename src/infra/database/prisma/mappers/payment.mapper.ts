@@ -8,12 +8,12 @@ import { InstallmentMapper } from './installment.mapper'
 
 export class PaymentMapper {
   static toDomain(
-    raw: PrismaPayment & { Installments: PrismaInstallment[] }
+    raw: PrismaPayment & { installments: PrismaInstallment[] }
   ): Payment {
     return Payment.create({
       catechizingId: new UniqueEntityID(raw.catechizingId),
       hasReceivedBooklet: raw.hasReceivedBooklet,
-      installments: raw.Installments.map(InstallmentMapper.toDomain),
+      installments: raw.installments.map(InstallmentMapper.toDomain),
       toBePaid: raw.toBePaid,
     })
   }

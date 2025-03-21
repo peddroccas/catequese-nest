@@ -12,7 +12,7 @@ import { PaymentMapper } from './payment.mapper'
 export class CatechizingMapper {
   static toDomain(
     raw: PrismaCatechizing & {
-      payments: (PrismaPayment & { Installments: PrismaInstallment[] })[]
+      payments: (PrismaPayment & { installments: PrismaInstallment[] })[]
       parents: PrismaParent[]
     }
   ): Catechizing {
@@ -28,8 +28,24 @@ export class CatechizingMapper {
         parents: raw.parents.map(ParentMapper.toDomain),
         classroomId: new UniqueEntityID(raw.classroomId!),
         payment: PaymentMapper.toDomain(raw.payments[0]),
+        releasedToGoAwayAlone: raw.releasedToGoAwayAlone,
       },
       new UniqueEntityID(raw.id)
     )
+  }
+
+  static toPrisma(catechizing: Catechizing): PrismaCatechizing {
+    return {
+      address: catechizing.address,
+      birthday: catechizing.birthday,
+      classroomId: catechizing.classroomId.toString(),
+      hasReceivedBaptism: catechizing.hasReceivedBaptism,
+      hasReceivedEucharist: catechizing.hasReceivedEucharist,
+      hasReceivedMarriage: catechizing.hasReceivedMarriage,
+      id: catechizing.id.toString(),
+      name: catechizing.name,
+      personWithSpecialNeeds: catechizing.personWithSpecialNeeds,
+      releasedToGoAwayAlone: catechizing.releasedToGoAwayAlone,
+    }
   }
 }

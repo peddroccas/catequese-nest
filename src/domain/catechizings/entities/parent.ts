@@ -4,7 +4,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 export interface ParentProps {
   name: string
   phone: string
-  kinship?: string
+  kinship: string
   catechizingId: UniqueEntityID
 }
 
@@ -17,7 +17,7 @@ export class Parent extends Entity<ParentProps> {
     return this.props.phone
   }
 
-  get kinship(): string | undefined {
+  get kinship(): string {
     return this.props.kinship
   }
 

@@ -8,12 +8,13 @@ export interface CatechizingProps {
   birthday: Date
   address: string
   personWithSpecialNeeds: boolean
+  releasedToGoAwayAlone: boolean
 
   hasReceivedBaptism: boolean
   hasReceivedEucharist: boolean
   hasReceivedMarriage: boolean
 
-  classroomId?: UniqueEntityID
+  classroomId: UniqueEntityID
   parents: Parent[]
   payment: Payment
 }
@@ -53,6 +54,14 @@ export class Catechizing extends Entity<CatechizingProps> {
 
   get payment(): Payment {
     return this.props.payment
+  }
+
+  get classroomId(): UniqueEntityID {
+    return this.props.classroomId
+  }
+
+  get releasedToGoAwayAlone(): boolean {
+    return this.props.releasedToGoAwayAlone
   }
 
   static create(props: CatechizingProps, id?: UniqueEntityID) {
