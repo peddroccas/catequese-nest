@@ -1,10 +1,9 @@
 import { Role } from '@/domain/catechists/enums/role'
-import { IsEnum, IsUUID } from 'class-validator'
+import { z } from 'zod'
 
-export class UserPayload {
-  @IsUUID()
-  sub: string
+export const tokenSchema = z.object({
+  sub: z.string().uuid(),
+  role: z.nativeEnum(Role),
+})
 
-  @IsEnum(Role)
-  role: Role
-}
+export type UserPayload = z.infer<typeof tokenSchema>

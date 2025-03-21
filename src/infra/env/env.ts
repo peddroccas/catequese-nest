@@ -1,12 +1,9 @@
-import { IsJWT, IsNumber, IsUrl } from 'class-validator'
+import { z } from 'zod'
 
-export class EnvDTO {
-  @IsUrl()
-  DATABASE_URL: string
+export const envSchema = z.object({
+  DATABASE_URL: z.string().url(),
+  JWT_SECRET: z.string(),
+  PORT: z.coerce.number().optional().default(3333),
+})
 
-  @IsJWT()
-  JWT_SECRET: string
-
-  @IsNumber()
-  PORT: number
-}
+export type EnvDTO = z.infer<typeof envSchema>
