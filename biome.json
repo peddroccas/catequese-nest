@@ -9,6 +9,7 @@
     "lineWidth": 80
   },
   "javascript": {
+    "parser": { "unsafeParameterDecoratorsEnabled": true },
     "formatter": {
       "arrowParentheses": "asNeeded",
       "jsxQuoteStyle": "double",
@@ -25,11 +26,15 @@
         "noStaticOnlyClass": "off",
         "noBannedTypes": "off"
       },
-      "style": { "noNonNullAssertion": "off", "useImportType": "off" },
+      "style": {
+        "useConst": "off",
+        "noNonNullAssertion": "off",
+        "useImportType": "off"
+      },
       "recommended": true
     }
   },
   "files": {
-    "ignore": ["node_modules"]
+    "ignore": ["node_modules", "dist"]
   }
 }

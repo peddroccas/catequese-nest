@@ -15,7 +15,7 @@ export interface CatechistProps {
   hasReceivedConfirmation: boolean
   hasReceivedMarriage: boolean
 
-  classroomId?: UniqueEntityID
+  classroomId: UniqueEntityID | null
 
   email: string
   password_hash: string
@@ -30,7 +30,7 @@ export class Catechist extends Entity<CatechistProps> {
     return this.props.nickname
   }
 
-  get classroomId(): UniqueEntityID | undefined {
+  get classroomId(): UniqueEntityID | null {
     return this.props.classroomId
   }
 

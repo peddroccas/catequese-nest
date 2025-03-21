@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { PrismaService } from '../prisma.service'
-import type { Prisma } from '@prisma/client'
+import { PrismaService } from '../prisma.service'
 import { CatechistRepository } from '@/domain/catechists/repositories/catechist.repository'
 import { Catechist } from '@/domain/catechists/entities/catechist'
 import { CatechistMapper } from '../mappers/catechist.mapper'

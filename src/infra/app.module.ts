@@ -4,6 +4,9 @@ import { envSchema } from './env/env'
 import { AuthModule } from './auth/auth.module'
 import { DatabaseModule } from './database/database.module'
 import { CryptographyModule } from './cryptography/cryptography.module'
+import { HttpModule } from './http/http.module'
+import { APP_PIPE } from '@nestjs/core'
+import { ValidationPipe } from './http/pipes/validation.pipe'
 
 @Module({
   imports: [
@@ -14,8 +17,8 @@ import { CryptographyModule } from './cryptography/cryptography.module'
     AuthModule,
     DatabaseModule,
     CryptographyModule,
+    HttpModule,
   ],
-  controllers: [],
-  providers: [],
+  providers: [{ provide: APP_PIPE, useClass: ValidationPipe }],
 })
 export class AppModule {}

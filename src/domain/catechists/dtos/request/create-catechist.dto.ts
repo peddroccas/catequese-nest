@@ -3,6 +3,7 @@ import {
   IsDate,
   IsEmail,
   IsEnum,
+  IsISO8601,
   IsOptional,
   IsString,
   IsUUID,
@@ -16,7 +17,7 @@ export class CreateCatechistRequestDto {
   @IsString()
   nickname: string
 
-  @IsDate()
+  @IsISO8601()
   birthday: Date
 
   @IsString()

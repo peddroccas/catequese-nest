@@ -37,7 +37,9 @@ export class CatechistMapper {
       name: catechist.name,
       password_hash: catechist.passwordHash,
       phone: catechist.phone,
-      classroomId: catechist.classroomId!.toString(),
+      classroomId: catechist.classroomId
+        ? catechist.classroomId.toString()
+        : null,
       id: catechist.id.toString(),
       nickname: catechist.nickname,
       role: catechist.role,
