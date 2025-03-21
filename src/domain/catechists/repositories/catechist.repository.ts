@@ -1,7 +1,7 @@
 import { Catechist } from '../entities/catechist'
 
 export abstract class CatechistRepository {
-  abstract create(catechist: Catechist): Promise<Catechist>
+  abstract create(catechist: Catechist): Promise<void>
   abstract checkDuplicatedCredentials(
     email: string,
     id?: string
@@ -11,5 +11,5 @@ export abstract class CatechistRepository {
   abstract findByEmail(email: string): Promise<Catechist | null>
   abstract findByClassroom(classroomId: string): Promise<Catechist[]>
   abstract findMany(): Promise<Catechist[]>
-  abstract update(catechist: Catechist): Promise<Catechist>
+  abstract update(catechist: Catechist): Promise<void>
 }

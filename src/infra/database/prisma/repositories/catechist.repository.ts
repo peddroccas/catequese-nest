@@ -1,25 +1,45 @@
 import { Injectable } from '@nestjs/common'
 import type { PrismaService } from '../prisma.service'
-import type { Catechist, Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import { CatechistRepository } from '@/domain/catechists/repositories/catechist.repository'
 import { Catechist } from '@/domain/catechists/entities/catechist'
+import { CatechistMapper } from '../mappers/catechist.mapper'
 
 @Injectable()
 export class PrismaCatechistRepository implements CatechistRepository {
   constructor(private db: PrismaService) {}
 
-  checkDuplicatedCredentials(email: string, id?: string): Promise<boolean> {
-    throw new Error('Method not implemented.')
+  async checkDuplicatedCredentials(
+    email: string,
+    id?: string
+  ): Promise<boolean> {
+    const catechist = await this.db.catechist.findUnique({
+      where: { email },
+    })
+
+    const emailAlreadyExists = Boolean(catechist) && catechist!.id !== id
+
+    return emailAlreadyExists
   }
-  findByClassroom(classroomId: string): Promise<Catechist[]> {
-    throw new Error('Method not implemented.')
+  async findByClassroom(classroomId: string): Promise<Catechist[]> {
+    const response = await this.db.catechist.findMany({
+      where: { classroomId },
+    })
+
+    return response.map(CatechistMapper.toDomain)
   }
-  findMany(): Promise<Catechist[]> {
-    throw new Error('Method not implemented.')
+  async findMany(): Promise<Catechist[]> {
+    const response = await this.db.catechist.findMany({
+      orderBy: { name: 'asc' },
+    })
+
+    return response.map(CatechistMapper.toDomain)
   }
 
-  async create(catechist: Prisma.CatechistCreateInput): Promise<Catechist> {
-    return await this.db.catechist.create({ data: catechist })
+  async create(catechist: Catechist): Promise<void> {
+    const data = CatechistMapper.toPrisma(catechist)
+
+    await this.db.catechist.create({ data })
   }
 
   async delete(id: string): Promise<void> {
@@ -27,40 +47,39 @@ export class PrismaCatechistRepository implements CatechistRepository {
   }
 
   async findAll(): Promise<Catechist[]> {
-    const catechists = await this.db.catechist.findMany({
+    const response = await this.db.catechist.findMany({
       orderBy: { name: 'asc' },
     })
 
-    return catechists
+    return response.map(CatechistMapper.toDomain)
   }
 
   async findById(id: string): Promise<Catechist | null> {
-    const catechist = await this.db.catechist.findUnique({ where: { id } })
+    const response = await this.db.catechist.findUnique({ where: { id } })
 
-    return catechist
+    if (!response) {
+      return null
+    }
+
+    return CatechistMapper.toDomain(response)
   }
 
   async findByEmail(email: string): Promise<Catechist | null> {
-    const catechist = await this.db.catechist.findUnique({ where: { email } })
+    const response = await this.db.catechist.findUnique({ where: { email } })
 
-    return catechist
+    if (!response) {
+      return null
+    }
+
+    return CatechistMapper.toDomain(response)
   }
 
-  async update(catechist: Catechist): Promise<Catechist> {
-    return await this.db.catechist.update({
-      where: { id: catechist.id! },
-      data: {
-        name: catechist.name,
-        nickname: catechist.nickname,
-        address: catechist.address,
-        email: catechist.email,
-        birthday: catechist.birthday,
-        phone: catechist.phone,
-        hasReceivedBaptism: catechist.hasReceivedBaptism,
-        hasReceivedEucharist: catechist.hasReceivedEucharist,
-        hasReceivedConfirmation: catechist.hasReceivedConfirmation,
-        hasReceivedMarriage: catechist.hasReceivedMarriage,
-      },
+  async update(catechist: Catechist): Promise<void> {
+    const data = CatechistMapper.toPrisma(catechist)
+
+    await this.db.catechist.update({
+      where: { id: catechist.id.toString() },
+      data,
     })
   }
 }
