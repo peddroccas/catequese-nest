@@ -40,6 +40,8 @@ export class UpdateCatechizingRequestDto {
 
   @IsBoolean()
   personWithSpecialNeeds: boolean
+  @IsBoolean()
+  releasedToGoAwayAlone: boolean
 
   @ValidateNested({ each: true }) // Valida cada item do array
   @Type(() => UpdateParentRequestDto) // Converte para a classe ParentDto

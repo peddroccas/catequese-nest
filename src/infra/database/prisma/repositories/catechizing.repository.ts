@@ -8,31 +8,14 @@ import { PrismaService } from '../prisma.service'
 export class PrismaCatechizingRepository implements CatechizingRepository {
   constructor(private db: PrismaService) {}
 
-  async create(catechizing: Catechizing): Promise<void> {
+  async create(catechizing: Catechizing): Promise<Catechizing> {
     const data = CatechizingMapper.toPrisma(catechizing)
-    const parents = catechizing.parents
-    const payment = catechizing.payment
 
-    await this.db.catechizing.create({
-      data: {
-        ...data,
-        parents: {
-          createMany: {
-            data: parents.map(parent => ({
-              name: parent.name,
-              phone: parent.phone,
-              kinship: parent.kinship,
-            })),
-          },
-        },
-        payments: {
-          create: {
-            toBePaid: payment.toBePaid,
-            hasReceivedBooklet: payment.hasReceivedBooklet,
-          },
-        },
-      },
+    const response = await this.db.catechizing.create({
+      data,
     })
+
+    return catechizing
   }
   async delete(id: string): Promise<void> {
     await this.db.catechizing.delete({
@@ -141,11 +124,14 @@ export class PrismaCatechizingRepository implements CatechizingRepository {
 
     return response.map(CatechizingMapper.toDomain)
   }
-  async update(catechizing: Catechizing): Promise<void> {
+  async update(catechizing: Catechizing): Promise<Catechizing> {
     const data = CatechizingMapper.toPrisma(catechizing)
+
     await this.db.catechizing.update({
       where: { id: catechizing.id.toString() },
       data,
     })
+
+    return catechizing
   }
 }

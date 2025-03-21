@@ -41,6 +41,9 @@ export class CreateCatechizingRequestDto {
   @IsBoolean()
   personWithSpecialNeeds: boolean
 
+  @IsBoolean()
+  releasedToGoAwayAlone: boolean
+
   @ValidateNested({ each: true }) // Valida cada item do array
   @Type(() => CreateParentRequestDto) // Converte para a classe ParentDto
   parents: Parent[]

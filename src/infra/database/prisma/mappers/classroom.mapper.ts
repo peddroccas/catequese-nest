@@ -6,7 +6,6 @@ import {
   Parent as PrismaParent,
   Installment as PrismaInstallment,
   Payment as PrismaPayment,
-  Prisma,
 } from '@prisma/client'
 import { CatechistMapper } from './catechist.mapper'
 import { Segment } from '@/domain/classroms/enums/segment'
@@ -19,7 +18,7 @@ export class ClassroomMapper {
     raw: PrismaClassroom & {
       catechists: PrismaCatechist[]
       catechizings: (PrismaCatechizing & {
-        payments: (PrismaPayment & { Installments: PrismaInstallment[] })[]
+        payments: (PrismaPayment & { installments: PrismaInstallment[] })[]
         parents: PrismaParent[]
       })[]
     }

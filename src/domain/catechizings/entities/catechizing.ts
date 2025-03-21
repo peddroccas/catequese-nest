@@ -15,8 +15,8 @@ export interface CatechizingProps {
   hasReceivedMarriage: boolean
 
   classroomId: UniqueEntityID
-  parents: Parent[]
-  payment: Payment
+  parents?: Parent[]
+  payment?: Payment
 }
 
 export class Catechizing extends Entity<CatechizingProps> {
@@ -48,11 +48,11 @@ export class Catechizing extends Entity<CatechizingProps> {
     return this.props.hasReceivedMarriage
   }
 
-  get parents(): Parent[] {
+  get parents(): Parent[] | undefined {
     return this.props.parents
   }
 
-  get payment(): Payment {
+  get payment(): Payment | undefined {
     return this.props.payment
   }
 

@@ -6,7 +6,7 @@ export interface PaymentProps {
   toBePaid: number
   hasReceivedBooklet: boolean
   catechizingId: UniqueEntityID
-  installments: Installment[]
+  installments?: Installment[]
 }
 
 export class Payment extends Entity<PaymentProps> {
@@ -22,7 +22,7 @@ export class Payment extends Entity<PaymentProps> {
     return this.props.catechizingId
   }
 
-  get installments(): Installment[] {
+  get installments(): Installment[] | undefined {
     return this.props.installments
   }
 
