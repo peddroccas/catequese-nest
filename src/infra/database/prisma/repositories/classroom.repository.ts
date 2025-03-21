@@ -68,10 +68,73 @@ export class PrismaClassroomRepository implements ClassroomRepository {
 
     return ClassroomMapper.toDomain(response)
   }
-  findMany(): Promise<Classroom[]> {
-    throw new Error('Method not implemented.')
+  async findMany(): Promise<Classroom[]> {
+    const response = await this.db.classroom.findMany({
+      orderBy: { roomNumber: 'asc' },
+      select: {
+        catechizings: {
+          select: {
+            address: true,
+            birthday: true,
+            classroomId: true,
+            hasReceivedBaptism: true,
+            hasReceivedEucharist: true,
+            hasReceivedMarriage: true,
+            id: true,
+            name: true,
+            personWithSpecialNeeds: true,
+            releasedToGoAwayAlone: true,
+            payments: {
+              select: {
+                catechizingId: true,
+                id: true,
+                hasReceivedBooklet: true,
+                toBePaid: true,
+                installments: true,
+              },
+            },
+            parents: true,
+          },
+        },
+        id: true,
+        segment: true,
+        startedAt: true,
+        roomNumber: true,
+        catechists: true,
+      },
+    })
+
+    return response.map(ClassroomMapper.toDomain)
   }
-  update(classroom: Classroom): Promise<Classroom> {
-    throw new Error('Method not implemented.')
+  async update(classroom: Classroom): Promise<void> {
+    const data = ClassroomMapper.toPrisma(classroom)
+
+    const currentCatechists = await this.db.classroom
+      .findUnique({
+        where: { id: data.id },
+        select: { catechists: { select: { id: true } } },
+      })
+      .catechists()
+
+    const currentCatechistIds = currentCatechists!.map(
+      catechist => catechist.id
+    )
+
+    const catechistsToDisconnect = currentCatechistIds.filter(
+      id =>
+        !classroom.catechists.map(catechist => catechist.id.toString() === id)
+    )
+    await this.db.classroom.update({
+      where: { id: data.id },
+      data: {
+        roomNumber: data.roomNumber,
+        segment: data.segment,
+        catechists: {
+          connect: data.catechists.map(catechist => ({ id: catechist.id })),
+          disconnect: catechistsToDisconnect.map(id => ({ id })),
+        },
+        startedAt: data.startedAt,
+      },
+    })
   }
 }

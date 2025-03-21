@@ -7,5 +7,5 @@ export abstract class ClassroomRepository {
   abstract delete(id: string): Promise<void>
   abstract findById(id: string): Promise<Classroom | null>
   abstract findMany(): Promise<Classroom[]>
-  abstract update(classroom: Classroom): Promise<Classroom>
+  abstract update(classroom: Classroom): Promise<void>
 }
