@@ -8,8 +8,10 @@ import { FetchAllCatechizingsUseCase } from '@/domain/catechizings/use-cases/fet
 import { FetchCatechizingByClassroomUseCase } from '@/domain/catechizings/use-cases/fetch-catechizing-by-classroom.use-case'
 import { TransferCatechizingUseCase } from '@/domain/catechizings/use-cases/transfer-catechizing.use-case'
 import { UpdateCatechizingUseCase } from '@/domain/catechizings/use-cases/update-catechizing.use-case'
+import { ParentRequiredError } from '@/domain/catechizings/use-cases/errors/parent-required-error'
 import { Roles } from '@/infra/auth/roles.decorator'
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -46,7 +48,14 @@ export class CatechizingController {
     )
 
     if (response.isLeft()) {
-      throw new NotFoundException('Turma não encontrada')
+      const error = response.value
+
+      switch (error.constructor) {
+        case ParentRequiredError:
+          throw new BadRequestException(error.message)
+        default:
+          throw new NotFoundException('Turma não encontrada')
+      }
     }
 
     return CatechizingPresenter.toHTTP(response.value.catechizing)
@@ -82,7 +91,14 @@ export class CatechizingController {
     )
 
     if (response.isLeft()) {
-      throw new NotFoundException()
+      const error = response.value
+
+      switch (error.constructor) {
+        case ParentRequiredError:
+          throw new BadRequestException(error.message)
+        default:
+          throw new NotFoundException(error.message)
+      }
     }
 
     return CatechizingPresenter.toHTTP(response.value.catechizing)
@@ -98,7 +114,14 @@ export class CatechizingController {
     )
 
     if (response.isLeft()) {
-      throw new NotFoundException()
+      const error = response.value
+
+      switch (error.constructor) {
+        case ParentRequiredError:
+          throw new BadRequestException(error.message)
+        default:
+          throw new NotFoundException(error.message)
+      }
     }
 
     return CatechizingPresenter.toHTTP(response.value.catechizing)

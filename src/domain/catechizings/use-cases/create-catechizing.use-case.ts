@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { ADULT_SEGMENTS } from '@/domain/classroms/enums/segment'
+import { ParentRequiredError } from './errors/parent-required-error'
 import { CatechizingRepository } from '../repositories/catechizing.repository'
 import { Catechizing } from '../entities/catechizing'
 import { CreateCatechizingRequestDto } from '../dtos/request/create-catechizing.dto'
@@ -32,6 +34,11 @@ export class CreateCatechizingUseCase {
 
     if (!classroom) {
       return left(new ResourceNotFoundError())
+    }
+
+    // Só turmas de adultos dispensam responsável
+    if (!parents.length && !ADULT_SEGMENTS.includes(classroom.segment)) {
+      return left(new ParentRequiredError())
     }
 
     const catechizingId = new UniqueEntityID()

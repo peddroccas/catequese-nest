@@ -1,5 +1,4 @@
 import {
-  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsDate,
@@ -43,7 +42,6 @@ export class UpdateCatechizingRequestDto {
   releasedToGoAwayAlone: boolean
 
   @IsArray()
-  @ArrayMinSize(1)
   @ValidateNested({ each: true }) // Valida cada item do array
   @Type(() => UpdateParentRequestDto) // Converte para a classe ParentDto
   parents: UpdateParentRequestDto[]

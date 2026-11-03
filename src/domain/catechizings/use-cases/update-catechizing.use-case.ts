@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { ADULT_SEGMENTS } from '@/domain/classroms/enums/segment'
+import { ParentRequiredError } from './errors/parent-required-error'
 import { CatechizingRepository } from '../repositories/catechizing.repository'
 import { Catechizing } from '../entities/catechizing'
 import { left, right } from '@/core/either'
@@ -39,6 +41,11 @@ export class UpdateCatechizingUseCase {
 
     if (!classroom) {
       return left(new ResourceNotFoundError())
+    }
+
+    // Só turmas de adultos dispensam responsável
+    if (!parents.length && !ADULT_SEGMENTS.includes(classroom.segment)) {
+      return left(new ParentRequiredError())
     }
 
     // Responsáveis com id precisam pertencer ao catequizando; sem id são novos
