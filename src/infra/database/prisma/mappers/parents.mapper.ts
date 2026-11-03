@@ -14,4 +14,14 @@ export class ParentMapper {
       new UniqueEntityID(raw.id)
     )
   }
+
+  static toPrisma(parent: Parent): PrismaParent {
+    return {
+      id: parent.id.toString(),
+      catechizingId: parent.catechizingId.toString(),
+      name: parent.name,
+      phone: parent.phone,
+      kinship: parent.kinship,
+    }
+  }
 }

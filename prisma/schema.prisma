@@ -53,8 +53,7 @@ model Catechizing {
   hasReceivedEucharist Boolean
   hasReceivedMarriage  Boolean @default(false)
 
-  payments Payment[]
-  parents  Parent[]
+  parents Parent[]
 
   classroom   Classroom? @relation(fields: [classroomId], references: [id], onDelete: Cascade)
   classroomId String
@@ -69,7 +68,7 @@ model Parent {
   kinship String
 
   catechizing   Catechizing @relation(fields: [catechizingId], references: [id], onDelete: Cascade)
-  catechizingId String      @unique
+  catechizingId String
 
   @@map("parents")
 }
@@ -84,28 +83,4 @@ model Classroom {
   catechizings Catechizing[]
 
   @@map("classrooms")
-}
-
-model Payment {
-  id                 String  @id @default(uuid())
-  toBePaid           Float
-  hasReceivedBooklet Boolean @default(false)
-
-  catechizing   Catechizing @relation(fields: [catechizingId], references: [id], onDelete: Cascade)
-  catechizingId String      @unique
-
-  installments Installment[]
-
-  @@map("payments")
-}
-
-model Installment {
-  id      String   @id @default(uuid())
-  payedAt DateTime @default(now())
-  value   Float
-
-  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-  paymentId String
-
-  @@map("installments")
 }

@@ -1,6 +1,5 @@
 import { Entity } from '@/core/entities/entity'
 import { Parent } from './parent'
-import { Payment } from './payment'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 export interface CatechizingProps {
@@ -15,8 +14,7 @@ export interface CatechizingProps {
   hasReceivedMarriage: boolean
 
   classroomId: UniqueEntityID
-  parents?: Parent[]
-  payment?: Payment
+  parents: Parent[]
 }
 
 export class Catechizing extends Entity<CatechizingProps> {
@@ -48,12 +46,8 @@ export class Catechizing extends Entity<CatechizingProps> {
     return this.props.hasReceivedMarriage
   }
 
-  get parents(): Parent[] | undefined {
+  get parents(): Parent[] {
     return this.props.parents
-  }
-
-  get payment(): Payment | undefined {
-    return this.props.payment
   }
 
   get classroomId(): UniqueEntityID {
