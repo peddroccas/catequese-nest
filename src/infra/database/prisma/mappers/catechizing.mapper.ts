@@ -5,6 +5,7 @@ import {
   Catechizing as PrismaCatechizing,
 } from '@prisma/client'
 import { ParentMapper } from './parents.mapper'
+import { MaritalStatus } from '@/domain/catechizings/enums/marital-status'
 
 export class CatechizingMapper {
   static toDomain(
@@ -22,6 +23,9 @@ export class CatechizingMapper {
         parents: raw.parents.map(ParentMapper.toDomain),
         classroomId: new UniqueEntityID(raw.classroomId),
         releasedToGoAwayAlone: raw.releasedToGoAwayAlone,
+        specialNeedsDescription: raw.specialNeedsDescription,
+        maritalStatus: raw.maritalStatus as MaritalStatus | null,
+        livesWithPartner: raw.livesWithPartner,
       },
       new UniqueEntityID(raw.id)
     )
@@ -39,6 +43,9 @@ export class CatechizingMapper {
       name: catechizing.name,
       personWithSpecialNeeds: catechizing.personWithSpecialNeeds,
       releasedToGoAwayAlone: catechizing.releasedToGoAwayAlone,
+      specialNeedsDescription: catechizing.specialNeedsDescription,
+      maritalStatus: catechizing.maritalStatus,
+      livesWithPartner: catechizing.livesWithPartner,
     }
   }
 }

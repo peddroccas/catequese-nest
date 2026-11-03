@@ -27,6 +27,9 @@ export class CreateCatechizingUseCase {
     personWithSpecialNeeds,
     hasReceivedEucharist,
     releasedToGoAwayAlone,
+    specialNeedsDescription,
+    maritalStatus,
+    livesWithPartner,
     hasReceivedMarriage,
     parents,
   }: CreateCatechizingRequestDto): Promise<CreateCatechizingResponseDto> {
@@ -37,7 +40,9 @@ export class CreateCatechizingUseCase {
     }
 
     // Só turmas de adultos dispensam responsável
-    if (!parents.length && !ADULT_SEGMENTS.includes(classroom.segment)) {
+    const isAdult = ADULT_SEGMENTS.includes(classroom.segment)
+
+    if (!parents.length && !isAdult) {
       return left(new ParentRequiredError())
     }
 
@@ -53,6 +58,11 @@ export class CreateCatechizingUseCase {
         name,
         releasedToGoAwayAlone,
         personWithSpecialNeeds,
+        specialNeedsDescription: personWithSpecialNeeds
+          ? (specialNeedsDescription ?? null)
+          : null,
+        maritalStatus: isAdult ? (maritalStatus ?? null) : null,
+        livesWithPartner: isAdult ? (livesWithPartner ?? null) : null,
         classroomId: classroom.id,
         parents: parents.map(parent =>
           Parent.create({

@@ -2,11 +2,14 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsEnum,
+  IsOptional,
   IsString,
   IsUUID,
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
+import { MaritalStatus } from '../../enums/marital-status'
 import { CreateParentRequestDto } from './create-parent.dto'
 
 export class CreateCatechizingRequestDto {
@@ -37,6 +40,18 @@ export class CreateCatechizingRequestDto {
 
   @IsBoolean()
   releasedToGoAwayAlone: boolean
+
+  @IsOptional()
+  @IsString()
+  specialNeedsDescription?: string
+
+  @IsOptional()
+  @IsEnum(MaritalStatus)
+  maritalStatus?: MaritalStatus
+
+  @IsOptional()
+  @IsBoolean()
+  livesWithPartner?: boolean
 
   @IsArray()
   @ValidateNested({ each: true }) // Valida cada item do array

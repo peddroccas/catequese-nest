@@ -41,12 +41,17 @@ model Catechist {
 }
 
 model Catechizing {
-  id                     String   @id @default(uuid())
-  name                   String
-  birthday               DateTime @db.Date
-  address                String
-  personWithSpecialNeeds Boolean
-  releasedToGoAwayAlone  Boolean  @default(false)
+  id                      String   @id @default(uuid())
+  name                    String
+  birthday                DateTime @db.Date
+  address                 String
+  personWithSpecialNeeds  Boolean
+  specialNeedsDescription String?
+  releasedToGoAwayAlone   Boolean  @default(false)
+
+  // Só preenchidos em turmas de adultos
+  maritalStatus    String?
+  livesWithPartner Boolean?
 
   hasReceivedBaptism   Boolean
   hasReceivedEucharist Boolean

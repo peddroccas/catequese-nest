@@ -1,13 +1,19 @@
 import { Entity } from '@/core/entities/entity'
 import { Parent } from './parent'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { MaritalStatus } from '../enums/marital-status'
 
 export interface CatechizingProps {
   name: string
   birthday: Date
   address: string
   personWithSpecialNeeds: boolean
+  specialNeedsDescription: string | null
   releasedToGoAwayAlone: boolean
+
+  // Só preenchidos em turmas de adultos
+  maritalStatus: MaritalStatus | null
+  livesWithPartner: boolean | null
 
   hasReceivedBaptism: boolean
   hasReceivedEucharist: boolean
@@ -56,6 +62,18 @@ export class Catechizing extends Entity<CatechizingProps> {
 
   get releasedToGoAwayAlone(): boolean {
     return this.props.releasedToGoAwayAlone
+  }
+
+  get specialNeedsDescription(): string | null {
+    return this.props.specialNeedsDescription
+  }
+
+  get maritalStatus(): MaritalStatus | null {
+    return this.props.maritalStatus
+  }
+
+  get livesWithPartner(): boolean | null {
+    return this.props.livesWithPartner
   }
 
   static create(props: CatechizingProps, id?: UniqueEntityID) {
