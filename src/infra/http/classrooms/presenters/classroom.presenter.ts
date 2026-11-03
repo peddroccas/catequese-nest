@@ -6,8 +6,10 @@ export class ClassroomPresenter {
 
     return {
       id: classroom.id.toString(),
-      name: `Turma ${classroom.roomNumber} - ${nicknames.join(' e ')}`,
-      roomNumber: classroom.roomNumber,
+      name: nicknames.length
+        ? `${classroom.location} - ${nicknames.join(' e ')}`
+        : classroom.location,
+      location: classroom.location,
       segment: classroom.segment,
       startedAt: classroom.startedAt,
       catechists: classroom.catechists.map(catechist => ({

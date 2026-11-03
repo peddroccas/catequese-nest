@@ -50,7 +50,7 @@ export class PrismaClassroomRepository implements ClassroomRepository {
     const response = await this.db.classroom.findMany({
       where: { segment },
       include: classroomInclude,
-      orderBy: { roomNumber: 'asc' },
+      orderBy: { location: 'asc' },
     })
 
     return response.map(ClassroomMapper.toDomain)

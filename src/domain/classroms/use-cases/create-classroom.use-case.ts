@@ -17,7 +17,7 @@ export class CreateClassroomUseCase {
 
   async execute({
     catechistsId,
-    roomNumber,
+    location,
     segment,
     startedAt,
   }: CreateClassroomRequestDto): Promise<CreateClassroomResponseDto> {
@@ -36,7 +36,7 @@ export class CreateClassroomUseCase {
 
     const classroom = Classroom.create({
       catechists,
-      roomNumber,
+      location,
       catechizings: [],
       segment,
       startedAt,

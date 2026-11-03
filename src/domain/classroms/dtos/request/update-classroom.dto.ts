@@ -1,12 +1,21 @@
-import { IsArray, IsEnum, IsInt, IsNumber, IsUUID, Min } from 'class-validator'
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator'
 import { Segment } from '../../enums/segment'
 
 export class UpdateClassroomRequestDto {
   @IsUUID()
   id: string
 
-  @IsNumber()
-  roomNumber: number
+  @IsString()
+  @IsNotEmpty()
+  location: string
 
   @IsEnum(Segment)
   segment: Segment

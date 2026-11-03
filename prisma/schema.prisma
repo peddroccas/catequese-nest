@@ -74,10 +74,10 @@ model Parent {
 }
 
 model Classroom {
-  id         String  @id @default(uuid())
-  roomNumber Decimal
-  segment    String
-  startedAt  Int
+  id        String @id @default(uuid())
+  location  String
+  segment   String
+  startedAt Int
 
   catechists   Catechist[]
   catechizings Catechizing[]

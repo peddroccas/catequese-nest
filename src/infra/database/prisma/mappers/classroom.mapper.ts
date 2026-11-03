@@ -9,7 +9,6 @@ import {
 import { CatechistMapper } from './catechist.mapper'
 import { Segment } from '@/domain/classroms/enums/segment'
 import { CatechizingMapper } from './catechizing.mapper'
-import { Decimal } from '@prisma/client/runtime/library'
 
 export class ClassroomMapper {
   static toDomain(
@@ -22,7 +21,7 @@ export class ClassroomMapper {
       {
         catechists: raw.catechists.map(CatechistMapper.toDomain),
         catechizings: raw.catechizings.map(CatechizingMapper.toDomain),
-        roomNumber: Number(raw.roomNumber),
+        location: raw.location,
         segment: raw.segment as Segment,
         startedAt: raw.startedAt,
       },
@@ -33,7 +32,7 @@ export class ClassroomMapper {
   static toPrisma(classroom: Classroom): PrismaClassroom {
     return {
       id: classroom.id.toString(),
-      roomNumber: new Decimal(classroom.roomNumber),
+      location: classroom.location,
       segment: classroom.segment,
       startedAt: classroom.startedAt,
     }

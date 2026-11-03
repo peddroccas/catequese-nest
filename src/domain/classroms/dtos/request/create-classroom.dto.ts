@@ -1,10 +1,19 @@
-import { IsArray, IsEnum, IsNumber, IsUUID, Min } from 'class-validator'
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator'
 import { Segment } from '../../enums/segment'
 
 const currentYear = new Date().getFullYear()
 export class CreateClassroomRequestDto {
-  @IsNumber()
-  roomNumber: number
+  @IsString()
+  @IsNotEmpty()
+  location: string
 
   @IsEnum(Segment)
   segment: Segment

@@ -5,7 +5,7 @@ import { Entity } from '@/core/entities/entity'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 export interface ClassroomProps {
-  roomNumber: number
+  location: string
   segment: Segment
 
   startedAt: number
@@ -14,8 +14,8 @@ export interface ClassroomProps {
 }
 
 export class Classroom extends Entity<ClassroomProps> {
-  get roomNumber(): number {
-    return this.props.roomNumber
+  get location(): string {
+    return this.props.location
   }
 
   get segment(): Segment {
