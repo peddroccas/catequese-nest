@@ -4,9 +4,12 @@ import {
   IsInt,
   IsNotEmpty,
   IsString,
+  IsOptional,
   IsUUID,
+  Matches,
   Min,
 } from 'class-validator'
+import { Transform } from 'class-transformer'
 import { Segment } from '../../enums/segment'
 
 export class UpdateClassroomRequestDto {
@@ -28,4 +31,12 @@ export class UpdateClassroomRequestDto {
   @IsArray()
   @IsUUID('4', { each: true })
   catechistsId: string[]
+
+  // Vazio remove o link
+  @Transform(({ value }) => (typeof value === 'string' && value.trim()) || null)
+  @IsOptional()
+  @Matches(/^https:\/\/chat\.whatsapp\.com\/\S+$/, {
+    message: 'Use o link de convite do grupo (https://chat.whatsapp.com/...)',
+  })
+  whatsappGroupLink?: string | null
 }

@@ -90,6 +90,9 @@ model Classroom {
   segment   String
   startedAt Int
 
+  // Link de convite do grupo de WhatsApp da turma (chat.whatsapp.com/...)
+  whatsappGroupLink String?
+
   catechists   Catechist[]
   catechizings Catechizing[]
 

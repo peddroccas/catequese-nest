@@ -11,6 +11,7 @@ export interface ClassroomProps {
   startedAt: number
   catechists: Catechist[]
   catechizings: Catechizing[]
+  whatsappGroupLink?: string | null
   archivedAt?: Date | null
 }
 
@@ -33,6 +34,10 @@ export class Classroom extends Entity<ClassroomProps> {
 
   get catechizings(): Catechizing[] {
     return this.props.catechizings
+  }
+
+  get whatsappGroupLink(): string | null {
+    return this.props.whatsappGroupLink ?? null
   }
 
   // Data em que foi para o arquivo; null enquanto está ativo

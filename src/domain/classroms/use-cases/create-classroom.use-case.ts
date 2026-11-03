@@ -20,6 +20,7 @@ export class CreateClassroomUseCase {
     location,
     segment,
     startedAt,
+    whatsappGroupLink,
   }: CreateClassroomRequestDto): Promise<CreateClassroomResponseDto> {
     const catechists: Catechist[] = []
 
@@ -40,6 +41,7 @@ export class CreateClassroomUseCase {
       catechizings: [],
       segment,
       startedAt,
+      whatsappGroupLink: whatsappGroupLink ?? null,
     })
 
     await this.classroomRepository.create(classroom)

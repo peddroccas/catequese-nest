@@ -12,6 +12,7 @@ export class ClassroomPresenter {
       location: classroom.location,
       segment: classroom.segment,
       startedAt: classroom.startedAt,
+      whatsappGroupLink: classroom.whatsappGroupLink,
       archivedAt: classroom.archivedAt?.toISOString() ?? null,
       catechists: classroom.catechists.map(catechist => ({
         id: catechist.id.toString(),

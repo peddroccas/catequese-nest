@@ -24,6 +24,7 @@ export class ClassroomMapper {
         location: raw.location,
         segment: raw.segment as Segment,
         startedAt: raw.startedAt,
+        whatsappGroupLink: raw.whatsappGroupLink,
         archivedAt: raw.archivedAt,
       },
       new UniqueEntityID(raw.id)
@@ -37,6 +38,7 @@ export class ClassroomMapper {
       location: classroom.location,
       segment: classroom.segment,
       startedAt: classroom.startedAt,
+      whatsappGroupLink: classroom.whatsappGroupLink,
     }
   }
 }

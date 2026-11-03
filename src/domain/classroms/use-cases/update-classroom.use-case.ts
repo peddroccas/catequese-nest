@@ -22,6 +22,7 @@ export class UpdateClassroomUseCase {
     location,
     segment,
     startedAt,
+    whatsappGroupLink,
   }: UpdateClassroomRequestDto): Promise<UpdateClassroomResponseDto> {
     const currentClassroom = await this.classroomRepository.findById(id)
 
@@ -49,6 +50,7 @@ export class UpdateClassroomUseCase {
         catechizings: currentClassroom.catechizings,
         segment,
         startedAt,
+        whatsappGroupLink: whatsappGroupLink ?? null,
       },
       new UniqueEntityID(id)
     )
