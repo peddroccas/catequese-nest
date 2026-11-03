@@ -4,12 +4,6 @@ export enum Segment {
   CRISMA_1 = 'Crisma 1',
   CRISMA_2 = 'Crisma 2',
   CATEQUESE_ADULTOS = 'Catequese Adultos',
-  CATECUMENOS_ADULTOS = 'Catecúmenos Adultos',
-  CATEQUIZANDOS_ADULTOS = 'Catequizandos Adultos',
 }
 
-export const ADULT_SEGMENTS: Segment[] = [
-  Segment.CATEQUESE_ADULTOS,
-  Segment.CATECUMENOS_ADULTOS,
-  Segment.CATEQUIZANDOS_ADULTOS,
-]
+export const ADULT_SEGMENTS: Segment[] = [Segment.CATEQUESE_ADULTOS]
