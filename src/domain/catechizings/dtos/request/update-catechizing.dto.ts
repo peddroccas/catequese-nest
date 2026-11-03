@@ -1,4 +1,5 @@
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsDate,
@@ -6,9 +7,7 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator'
-import { Parent } from '../../entities/parent'
 import { Type } from 'class-transformer'
-import { CreateParentRequestDto } from './create-parent.dto'
 import { UpdateParentRequestDto } from './update-parent.dto'
 
 export class UpdateCatechizingRequestDto {
@@ -18,6 +17,7 @@ export class UpdateCatechizingRequestDto {
   @IsString()
   name: string
 
+  @Type(() => Date)
   @IsDate()
   birthday: Date
 
@@ -26,8 +26,6 @@ export class UpdateCatechizingRequestDto {
 
   @IsBoolean()
   hasReceivedBaptism: boolean
-
-  @IsBoolean()
 
   @IsBoolean()
   hasReceivedEucharist: boolean
@@ -40,10 +38,13 @@ export class UpdateCatechizingRequestDto {
 
   @IsBoolean()
   personWithSpecialNeeds: boolean
+
   @IsBoolean()
   releasedToGoAwayAlone: boolean
 
+  @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true }) // Valida cada item do array
   @Type(() => UpdateParentRequestDto) // Converte para a classe ParentDto
-  parents: Parent[]
+  parents: UpdateParentRequestDto[]
 }

@@ -2,14 +2,19 @@ import { Injectable } from '@nestjs/common'
 import { CatechizingRepository } from '../repositories/catechizing.repository'
 import { Catechizing } from '../entities/catechizing'
 import { CreateCatechizingRequestDto } from '../dtos/request/create-catechizing.dto'
-import { right } from '@/core/either'
+import { left, right } from '@/core/either'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
-import { Payment } from '../entities/payment'
-import { BOOKLET_VALUE } from '../constants/payment'
+import { Parent } from '../entities/parent'
+import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
+import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
+import { CreateCatechizingResponseDto } from '../dtos/response/create-catechizing.dto'
 
 @Injectable()
 export class CreateCatechizingUseCase {
-  constructor(private catechizingRepository: CatechizingRepository) {}
+  constructor(
+    private catechizingRepository: CatechizingRepository,
+    private classroomRepository: ClassroomRepository
+  ) {}
 
   async execute({
     address,
@@ -21,18 +26,38 @@ export class CreateCatechizingUseCase {
     hasReceivedEucharist,
     releasedToGoAwayAlone,
     hasReceivedMarriage,
-  }: CreateCatechizingRequestDto) {
-    const catechizing = Catechizing.create({
-      address,
-      birthday,
-      hasReceivedBaptism,
-      hasReceivedEucharist,
-      hasReceivedMarriage,
-      name,
-      releasedToGoAwayAlone,
-      personWithSpecialNeeds,
-      classroomId: new UniqueEntityID(classroomId),
-    })
+    parents,
+  }: CreateCatechizingRequestDto): Promise<CreateCatechizingResponseDto> {
+    const classroom = await this.classroomRepository.findById(classroomId)
+
+    if (!classroom) {
+      return left(new ResourceNotFoundError())
+    }
+
+    const catechizingId = new UniqueEntityID()
+
+    const catechizing = Catechizing.create(
+      {
+        address,
+        birthday,
+        hasReceivedBaptism,
+        hasReceivedEucharist,
+        hasReceivedMarriage,
+        name,
+        releasedToGoAwayAlone,
+        personWithSpecialNeeds,
+        classroomId: classroom.id,
+        parents: parents.map(parent =>
+          Parent.create({
+            name: parent.name,
+            phone: parent.phone,
+            kinship: parent.kinship,
+            catechizingId,
+          })
+        ),
+      },
+      catechizingId
+    )
 
     await this.catechizingRepository.create(catechizing)
 

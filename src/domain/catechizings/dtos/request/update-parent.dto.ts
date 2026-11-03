@@ -1,8 +1,9 @@
 import { IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class UpdateParentRequestDto {
+  @IsOptional()
   @IsUUID()
-  id: string
+  id?: string
 
   @IsString()
   name: string
@@ -10,7 +11,6 @@ export class UpdateParentRequestDto {
   @IsString()
   phone: string
 
-  @IsOptional()
   @IsString()
   kinship: string
 }

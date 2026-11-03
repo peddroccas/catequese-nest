@@ -6,7 +6,7 @@ import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.r
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 
 @Injectable()
-export class FetchCatechizingByIdUseCase {
+export class FetchCatechizingByClassroomUseCase {
   constructor(
     private catechizingRepository: CatechizingRepository,
     private classroomRepository: ClassroomRepository
