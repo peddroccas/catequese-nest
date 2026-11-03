@@ -1,20 +1,20 @@
 import { NestFactory } from '@nestjs/core'
+import { ConfigService } from '@nestjs/config'
 import { AppModule } from './infra/app.module'
-import { ValidationPipe } from './infra/http/pipes/validation.pipe'
+import { EnvDTO } from './infra/env/env'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
-  // Configuração simples de CORS permitindo todas as origens
+  // O front autentica via header Authorization (sem cookies), então não precisa de credentials
   app.enableCors({
-    origin: '*', // Permite todas as origens (teste)
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Authorization, Content-Type',
-    credentials: true,
   })
 
-  app.useGlobalPipes(new ValidationPipe())
+  const config = app.get<ConfigService<EnvDTO, true>>(ConfigService)
 
-  await app.listen(process.env.PORT ?? 3000)
+  await app.listen(config.get('PORT', { infer: true }))
 }
 bootstrap()

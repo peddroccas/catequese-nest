@@ -1,8 +1,7 @@
 import { IsArray, IsEnum, IsNumber, IsUUID, Min } from 'class-validator'
 import { Segment } from '../../enums/segment'
-import dayjs from 'dayjs'
 
-const currentYear = dayjs().year()
+const currentYear = new Date().getFullYear()
 export class CreateClassroomRequestDto {
   @IsNumber()
   roomNumber: number

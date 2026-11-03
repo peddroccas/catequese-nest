@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { UserPayload } from './token.dto'
-import { validate } from 'class-validator'
+import { tokenSchema, UserPayload } from './token.dto'
 import { EnvDTO } from '../env/env'
 
 @Injectable()
@@ -18,6 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: UserPayload) {
-    return validate(payload)
+    return tokenSchema.parse(payload)
   }
 }

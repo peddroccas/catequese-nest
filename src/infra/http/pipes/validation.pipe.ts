@@ -14,7 +14,8 @@ export class ValidationPipe implements PipeTransform<unknown> {
       return value
     }
     const object = plainToInstance(metatype, value)
-    const errors = await validate(object)
+    // whitelist remove do body as propriedades que não estão no DTO
+    const errors = await validate(object, { whitelist: true })
     if (errors.length > 0) {
       throw new BadRequestException(
         errors.map(error => {
@@ -26,7 +27,8 @@ export class ValidationPipe implements PipeTransform<unknown> {
         })
       )
     }
-    return value
+    // Retorna a instância transformada (datas convertidas, e-mail em minúsculo...)
+    return object
   }
 
   private toValidate(metatype: Function): boolean {
