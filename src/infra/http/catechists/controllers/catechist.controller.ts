@@ -13,11 +13,13 @@ import { TransferCatechistUseCase } from '@/domain/catechists/use-cases/transfer
 import { UpdatePasswordUseCase } from '@/domain/catechists/use-cases/update-catechist-password.use-case'
 import { UpdateCatechistUseCase } from '@/domain/catechists/use-cases/update-catechist.use-case'
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { Public } from '@/infra/auth/public'
 import { Roles } from '@/infra/auth/roles.decorator'
 import { UserPayload } from '@/infra/auth/token.dto'
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -106,7 +108,16 @@ export class CatechistController {
     )
 
     if (response.isLeft()) {
-      throw new NotFoundException()
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException(
+            'A nova senha não pode ser a senha padrão'
+          )
+        default:
+          throw new NotFoundException(error.message)
+      }
     }
   }
 

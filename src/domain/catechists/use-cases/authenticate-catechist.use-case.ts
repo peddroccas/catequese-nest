@@ -6,6 +6,7 @@ import { CatechistRepository } from '../repositories/catechist.repository'
 import { WrongCredentialsError } from './errors/wrog-credentials-error'
 import { AuthenticateCatechistRequestDto } from '../dtos/request/authenticate-catechist.dto'
 import { AuthenticateCatechistResponseDto } from '../dtos/response/authenticate-catechist.dto'
+import { DEFAULT_PASSWORD } from '../constants/password'
 
 @Injectable()
 export class AuthenticateCatechistUseCase {
@@ -41,6 +42,8 @@ export class AuthenticateCatechistUseCase {
 
     return right({
       accessToken,
+      // O front deve levar para a troca de senha enquanto a padrão estiver em uso
+      mustChangePassword: password === DEFAULT_PASSWORD,
     })
   }
 }

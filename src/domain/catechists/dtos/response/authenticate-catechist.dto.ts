@@ -5,5 +5,6 @@ export type AuthenticateCatechistResponseDto = Either<
   WrongCredentialsError,
   {
     accessToken: string
+    mustChangePassword: boolean
   }
 >

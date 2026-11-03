@@ -7,6 +7,7 @@ import { left, right } from '@/core/either'
 import { Catechist } from '../entities/catechist'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
+import { DEFAULT_PASSWORD } from '../constants/password'
 
 @Injectable()
 export class CreateCatechistUseCase {
@@ -36,7 +37,7 @@ export class CreateCatechistUseCase {
       return left(new DuplicatedError())
     }
 
-    const hashedPassword = await this.hashGenerator.hash('123456')
+    const hashedPassword = await this.hashGenerator.hash(DEFAULT_PASSWORD)
     const catechist = Catechist.create(
       {
         address,

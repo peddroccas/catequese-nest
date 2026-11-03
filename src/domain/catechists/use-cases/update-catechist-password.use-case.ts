@@ -6,6 +6,8 @@ import { UpdateCatechistPasswordRequestDto } from '../dtos/request/update-catech
 import { UpdateCatechistPasswordResponseDto } from '../dtos/response/update-catechist-password.dto'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 import { Catechist } from '../entities/catechist'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
+import { DEFAULT_PASSWORD } from '../constants/password'
 
 @Injectable()
 export class UpdatePasswordUseCase {
@@ -22,6 +24,10 @@ export class UpdatePasswordUseCase {
 
     if (!currentUser) {
       return left(new ResourceNotFoundError())
+    }
+
+    if (password === DEFAULT_PASSWORD) {
+      return left(new NotAllowedError())
     }
 
     const hashedPassword = await this.hashGenerator.hash(password)
