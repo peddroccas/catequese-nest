@@ -1,10 +1,12 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Catechist } from '@/domain/catechists/entities/catechist'
 import { Role } from '@/domain/catechists/enums/role'
-import { Prisma, Catechist as PrismaCatechist } from '@prisma/client'
+import { Catechist as PrismaCatechist } from '@prisma/client'
 
 export class CatechistMapper {
-  static toDomain(raw: PrismaCatechist): Catechist {
+  static toDomain(
+    raw: PrismaCatechist & { classrooms?: { id: string }[] }
+  ): Catechist {
     return Catechist.create(
       {
         address: raw.address,
@@ -19,9 +21,9 @@ export class CatechistMapper {
         password_hash: raw.password_hash,
         phone: raw.phone,
         role: Role[raw.role],
-        classroomId: raw.classroomId
-          ? new UniqueEntityID(raw.classroomId)
-          : null,
+        classroomIds: (raw.classrooms ?? []).map(
+          classroom => new UniqueEntityID(classroom.id)
+        ),
       },
       new UniqueEntityID(raw.id)
     )
@@ -39,9 +41,6 @@ export class CatechistMapper {
       name: catechist.name,
       password_hash: catechist.passwordHash,
       phone: catechist.phone,
-      classroomId: catechist.classroomId
-        ? catechist.classroomId.toString()
-        : null,
       id: catechist.id.toString(),
       nickname: catechist.nickname,
       role: catechist.role,

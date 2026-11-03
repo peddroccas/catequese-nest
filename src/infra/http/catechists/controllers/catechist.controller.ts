@@ -1,6 +1,5 @@
 import { AuthenticateCatechistRequestDto } from '@/domain/catechists/dtos/request/authenticate-catechist.dto'
 import { CreateCatechistRequestDto } from '@/domain/catechists/dtos/request/create-catechist.dto'
-import { TransferCatechistRequestDto } from '@/domain/catechists/dtos/request/transfer-catechist.dto'
 import { UpdateCatechistPasswordRequestDto } from '@/domain/catechists/dtos/request/update-catechist-password.dto'
 import { UpdateCatechistRequestDto } from '@/domain/catechists/dtos/request/update-catechist.dto'
 import { Role } from '@/domain/catechists/enums/role'
@@ -9,7 +8,6 @@ import { CreateCatechistUseCase } from '@/domain/catechists/use-cases/create-cat
 import { DeleteCatechistUseCase } from '@/domain/catechists/use-cases/delete-catechist.use-case'
 import { FetchAllCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-all-catechists.use-case'
 import { FetchCatechistByIdUseCase } from '@/domain/catechists/use-cases/fetch-catechist-by-id.use-case'
-import { TransferCatechistUseCase } from '@/domain/catechists/use-cases/transfer-catechist.use-case'
 import { UpdatePasswordUseCase } from '@/domain/catechists/use-cases/update-catechist-password.use-case'
 import { UpdateCatechistUseCase } from '@/domain/catechists/use-cases/update-catechist.use-case'
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
@@ -45,8 +43,7 @@ export class CatechistController {
     private fetchAllCatechists: FetchAllCatechistsUseCase,
     private fetchCatechistById: FetchCatechistByIdUseCase,
     private updateCatechist: UpdateCatechistUseCase,
-    private updatePassword: UpdatePasswordUseCase,
-    private transferCatechist: TransferCatechistUseCase
+    private updatePassword: UpdatePasswordUseCase
   ) {}
 
   @Post()
@@ -56,7 +53,14 @@ export class CatechistController {
     const result = await this.createCatechist.execute(createCatechistRequestDto)
 
     if (result.isLeft()) {
-      throw new ConflictException(result.value.message)
+      const error = result.value
+
+      switch (error.constructor) {
+        case DuplicatedError:
+          throw new ConflictException(error.message)
+        default:
+          throw new NotFoundException('Turma não encontrada')
+      }
     }
 
     return CatechistPresenter.toHTTP(result.value.catechist)
@@ -118,21 +122,6 @@ export class CatechistController {
         default:
           throw new NotFoundException(error.message)
       }
-    }
-  }
-
-  @Patch('/transfer')
-  @Roles([Role.COORDINATOR])
-  @HttpCode(204)
-  async transfer(
-    @Body() transferCatechistRequestDto: TransferCatechistRequestDto
-  ) {
-    const response = await this.transferCatechist.execute(
-      transferCatechistRequestDto
-    )
-
-    if (response.isLeft()) {
-      throw new NotFoundException()
     }
   }
 

@@ -16,7 +16,7 @@ export class CatechistPresenter {
       hasReceivedEucharist: catechist.hasReceivedEucharist,
       hasReceivedConfirmation: catechist.hasReceivedConfirmation,
       hasReceivedMarriage: catechist.hasReceivedMarriage,
-      classroomId: catechist.classroomId?.toString() ?? null,
+      classroomIds: catechist.classroomIds.map(id => id.toString()),
     }
   }
 }

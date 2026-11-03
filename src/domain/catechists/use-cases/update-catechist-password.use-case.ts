@@ -40,7 +40,7 @@ export class UpdatePasswordUseCase {
         phone: currentUser.phone,
         address: currentUser.address,
         birthday: currentUser.birthday,
-        classroomId: currentUser.classroomId,
+        classroomIds: currentUser.classroomIds,
         hasReceivedBaptism: currentUser.hasReceivedBaptism,
         hasReceivedConfirmation: currentUser.hasReceivedConfirmation,
         hasReceivedEucharist: currentUser.hasReceivedEucharist,

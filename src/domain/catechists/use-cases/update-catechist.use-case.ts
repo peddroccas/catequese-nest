@@ -7,10 +7,14 @@ import { UpdateCatechistResponseDto } from '../dtos/response/update-catechist.dt
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
 
 @Injectable()
 export class UpdateCatechistUseCase {
-  constructor(private catechistRepository: CatechistRepository) {}
+  constructor(
+    private catechistRepository: CatechistRepository,
+    private classroomRepository: ClassroomRepository
+  ) {}
 
   async execute({
     id,
@@ -25,7 +29,7 @@ export class UpdateCatechistUseCase {
     nickname,
     phone,
     role,
-    classroomId,
+    classroomIds = [],
   }: UpdateCatechistRequestDto): Promise<UpdateCatechistResponseDto> {
     const currentCatechist = await this.catechistRepository.findById(id)
 
@@ -38,6 +42,14 @@ export class UpdateCatechistUseCase {
 
     if (hasCatechistWithEmail) {
       return left(new DuplicatedError())
+    }
+
+    for (const classroomId of classroomIds) {
+      const classroomExists = await this.classroomRepository.exists(classroomId)
+
+      if (!classroomExists) {
+        return left(new ResourceNotFoundError())
+      }
     }
 
     const catechist = Catechist.create(
@@ -54,7 +66,7 @@ export class UpdateCatechistUseCase {
         phone,
         role,
         password_hash: currentCatechist.passwordHash,
-        classroomId: classroomId ? new UniqueEntityID(classroomId) : null,
+        classroomIds: classroomIds.map(id => new UniqueEntityID(id)),
       },
       currentCatechist.id
     )

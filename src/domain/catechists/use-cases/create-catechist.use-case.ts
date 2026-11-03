@@ -8,12 +8,15 @@ import { Catechist } from '../entities/catechist'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
 import { DEFAULT_PASSWORD } from '../constants/password'
+import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
+import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 
 @Injectable()
 export class CreateCatechistUseCase {
   constructor(
     private catechistRepository: CatechistRepository,
-    private hashGenerator: HashGenerator
+    private hashGenerator: HashGenerator,
+    private classroomRepository: ClassroomRepository
   ) {}
 
   async execute({
@@ -28,13 +31,21 @@ export class CreateCatechistUseCase {
     nickname,
     phone,
     role,
-    classroomId,
+    classroomIds = [],
   }: CreateCatechistRequestDto): Promise<CreateCatechistResponseDto> {
     const hasCatechistWithEmail =
       await this.catechistRepository.checkDuplicatedCredentials(email)
 
     if (hasCatechistWithEmail) {
       return left(new DuplicatedError())
+    }
+
+    for (const classroomId of classroomIds) {
+      const classroomExists = await this.classroomRepository.exists(classroomId)
+
+      if (!classroomExists) {
+        return left(new ResourceNotFoundError())
+      }
     }
 
     const hashedPassword = await this.hashGenerator.hash(DEFAULT_PASSWORD)
@@ -52,7 +63,7 @@ export class CreateCatechistUseCase {
         phone,
         role,
         password_hash: hashedPassword,
-        classroomId: classroomId ? new UniqueEntityID(classroomId) : null,
+        classroomIds: classroomIds.map(id => new UniqueEntityID(id)),
       },
       new UniqueEntityID()
     )

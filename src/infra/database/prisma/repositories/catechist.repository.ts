@@ -4,6 +4,8 @@ import { CatechistRepository } from '@/domain/catechists/repositories/catechist.
 import { Catechist } from '@/domain/catechists/entities/catechist'
 import { CatechistMapper } from '../mappers/catechist.mapper'
 
+const catechistInclude = { classrooms: { select: { id: true } } } as const
+
 @Injectable()
 export class PrismaCatechistRepository implements CatechistRepository {
   constructor(private db: PrismaService) {}
@@ -22,13 +24,15 @@ export class PrismaCatechistRepository implements CatechistRepository {
   }
   async findByClassroom(classroomId: string): Promise<Catechist[]> {
     const response = await this.db.catechist.findMany({
-      where: { classroomId },
+      where: { classrooms: { some: { id: classroomId } } },
+      include: catechistInclude,
     })
 
     return response.map(CatechistMapper.toDomain)
   }
   async findMany(): Promise<Catechist[]> {
     const response = await this.db.catechist.findMany({
+      include: catechistInclude,
       orderBy: { name: 'asc' },
     })
 
@@ -38,23 +42,25 @@ export class PrismaCatechistRepository implements CatechistRepository {
   async create(catechist: Catechist): Promise<void> {
     const data = CatechistMapper.toPrisma(catechist)
 
-    await this.db.catechist.create({ data })
+    await this.db.catechist.create({
+      data: {
+        ...data,
+        classrooms: {
+          connect: catechist.classroomIds.map(id => ({ id: id.toString() })),
+        },
+      },
+    })
   }
 
   async delete(id: string): Promise<void> {
     await this.db.catechist.delete({ where: { id } })
   }
 
-  async findAll(): Promise<Catechist[]> {
-    const response = await this.db.catechist.findMany({
-      orderBy: { name: 'asc' },
-    })
-
-    return response.map(CatechistMapper.toDomain)
-  }
-
   async findById(id: string): Promise<Catechist | null> {
-    const response = await this.db.catechist.findUnique({ where: { id } })
+    const response = await this.db.catechist.findUnique({
+      where: { id },
+      include: catechistInclude,
+    })
 
     if (!response) {
       return null
@@ -64,7 +70,10 @@ export class PrismaCatechistRepository implements CatechistRepository {
   }
 
   async findByEmail(email: string): Promise<Catechist | null> {
-    const response = await this.db.catechist.findUnique({ where: { email } })
+    const response = await this.db.catechist.findUnique({
+      where: { email },
+      include: catechistInclude,
+    })
 
     if (!response) {
       return null
@@ -74,11 +83,17 @@ export class PrismaCatechistRepository implements CatechistRepository {
   }
 
   async update(catechist: Catechist): Promise<void> {
-    const data = CatechistMapper.toPrisma(catechist)
+    const { id, ...data } = CatechistMapper.toPrisma(catechist)
 
+    // `set` substitui as turmas do catequista pelas informadas
     await this.db.catechist.update({
-      where: { id: catechist.id.toString() },
-      data,
+      where: { id },
+      data: {
+        ...data,
+        classrooms: {
+          set: catechist.classroomIds.map(id => ({ id: id.toString() })),
+        },
+      },
     })
   }
 }

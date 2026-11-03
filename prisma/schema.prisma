@@ -35,8 +35,7 @@ model Catechist {
   email         String @unique
   password_hash String
 
-  classroom   Classroom? @relation(fields: [classroomId], references: [id])
-  classroomId String?
+  classrooms Classroom[]
 
   @@map("catechists")
 }

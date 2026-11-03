@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsDate,
   IsEmail,
@@ -44,8 +45,9 @@ export class CreateCatechistRequestDto {
   hasReceivedMarriage: boolean
 
   @IsOptional()
-  @IsUUID()
-  classroomId?: string
+  @IsArray()
+  @IsUUID('4', { each: true })
+  classroomIds?: string[]
 
   @IsEnum(Role)
   role: Role

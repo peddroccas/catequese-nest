@@ -46,6 +46,11 @@ export class PrismaClassroomRepository implements ClassroomRepository {
 
     return ClassroomMapper.toDomain(response)
   }
+  async exists(id: string): Promise<boolean> {
+    const count = await this.db.classroom.count({ where: { id } })
+
+    return count > 0
+  }
   async findMany(segment?: Segment): Promise<Classroom[]> {
     const response = await this.db.classroom.findMany({
       where: { segment },
