@@ -35,7 +35,8 @@ model Catechist {
   email         String @unique
   password_hash String
 
-  classrooms Classroom[]
+  classrooms           Classroom[]
+  formationAttendances FormationAttendance[]
 
   @@map("catechists")
 }
@@ -89,3 +90,26 @@ model Classroom {
   @@map("classrooms")
 }
 
+model Formation {
+  id    String   @id @default(uuid())
+  theme String
+  date  DateTime @db.Date
+
+  attendances FormationAttendance[]
+
+  @@map("formations")
+}
+
+model FormationAttendance {
+  id        String  @id @default(uuid())
+  isPresent Boolean
+
+  formation   Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+  formationId String
+
+  catechist   Catechist @relation(fields: [catechistId], references: [id], onDelete: Cascade)
+  catechistId String
+
+  @@unique([formationId, catechistId])
+  @@map("formation_attendances")
+}

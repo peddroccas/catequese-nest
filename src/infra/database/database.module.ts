@@ -6,6 +6,8 @@ import { PrismaCatechizingRepository } from './prisma/repositories/catechizing.r
 import { CatechizingRepository } from '@/domain/catechizings/repositories/catechizing.repository'
 import { PrismaClassroomRepository } from './prisma/repositories/classroom.repository'
 import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
+import { PrismaFormationRepository } from './prisma/repositories/formation.repository'
+import { FormationRepository } from '@/domain/formations/repositories/formation.repository'
 
 @Global()
 @Module({
@@ -24,12 +26,17 @@ import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.r
       provide: ClassroomRepository,
       useClass: PrismaClassroomRepository,
     },
+    {
+      provide: FormationRepository,
+      useClass: PrismaFormationRepository,
+    },
   ],
   exports: [
     PrismaService,
     CatechistRepository,
     CatechizingRepository,
     ClassroomRepository,
+    FormationRepository,
   ],
 })
 export class DatabaseModule {}
