@@ -2,11 +2,12 @@ import { CatechistRepository } from '@/domain/catechists/repositories/catechist.
 import { Injectable } from '@nestjs/common'
 import { ClassroomRepository } from '../repositories/classroom.repository'
 import { UpdateClassroomRequestDto } from '../dtos/request/update-classroom.dto'
-import { left } from '@/core/either'
+import { left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 import { Catechist } from '@/domain/catechists/entities/catechist'
 import { Classroom } from '../entities/classroom'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { UpdateClassroomResponseDto } from '../dtos/response/update-classroom.dto'
 
 @Injectable()
 export class UpdateClassroomUseCase {
@@ -21,7 +22,7 @@ export class UpdateClassroomUseCase {
     roomNumber,
     segment,
     startedAt,
-  }: UpdateClassroomRequestDto) {
+  }: UpdateClassroomRequestDto): Promise<UpdateClassroomResponseDto> {
     const currentClassroom = await this.classroomRepository.findById(id)
 
     if (!currentClassroom) {
@@ -53,5 +54,7 @@ export class UpdateClassroomUseCase {
     )
 
     await this.classroomRepository.update(classroom)
+
+    return right({ classroom })
   }
 }

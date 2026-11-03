@@ -1,25 +1,33 @@
 import { Classroom } from '@/domain/classroms/entities/classroom'
 import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
+import { Segment } from '@/domain/classroms/enums/segment'
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
 import { ClassroomMapper } from '../mappers/classroom.mapper'
+
+const classroomInclude = {
+  catechists: { orderBy: { name: 'asc' } },
+  catechizings: {
+    include: { parents: true },
+    orderBy: { name: 'asc' },
+  },
+} as const
 
 @Injectable()
 export class PrismaClassroomRepository implements ClassroomRepository {
   constructor(private db: PrismaService) {}
 
   async create(classroom: Classroom): Promise<void> {
-    const { startedAt, segment, roomNumber, catechists } = classroom
+    const data = ClassroomMapper.toPrisma(classroom)
+
     await this.db.classroom.create({
       data: {
-        roomNumber,
-        segment,
+        ...data,
         catechists: {
-          connect: catechists.map(catechist => ({
+          connect: classroom.catechists.map(catechist => ({
             id: catechist.id.toString(),
           })),
         },
-        startedAt,
       },
     })
   }
@@ -29,37 +37,7 @@ export class PrismaClassroomRepository implements ClassroomRepository {
   async findById(id: string): Promise<Classroom | null> {
     const response = await this.db.classroom.findUnique({
       where: { id },
-      select: {
-        catechizings: {
-          select: {
-            address: true,
-            birthday: true,
-            classroomId: true,
-            hasReceivedBaptism: true,
-            hasReceivedEucharist: true,
-            hasReceivedMarriage: true,
-            id: true,
-            name: true,
-            personWithSpecialNeeds: true,
-            releasedToGoAwayAlone: true,
-            payments: {
-              select: {
-                catechizingId: true,
-                id: true,
-                hasReceivedBooklet: true,
-                toBePaid: true,
-                installments: true,
-              },
-            },
-            parents: true,
-          },
-        },
-        id: true,
-        segment: true,
-        startedAt: true,
-        roomNumber: true,
-        catechists: true,
-      },
+      include: classroomInclude,
     })
 
     if (!response) {
@@ -68,72 +46,28 @@ export class PrismaClassroomRepository implements ClassroomRepository {
 
     return ClassroomMapper.toDomain(response)
   }
-  async findMany(): Promise<Classroom[]> {
+  async findMany(segment?: Segment): Promise<Classroom[]> {
     const response = await this.db.classroom.findMany({
+      where: { segment },
+      include: classroomInclude,
       orderBy: { roomNumber: 'asc' },
-      select: {
-        catechizings: {
-          select: {
-            address: true,
-            birthday: true,
-            classroomId: true,
-            hasReceivedBaptism: true,
-            hasReceivedEucharist: true,
-            hasReceivedMarriage: true,
-            id: true,
-            name: true,
-            personWithSpecialNeeds: true,
-            releasedToGoAwayAlone: true,
-            payments: {
-              select: {
-                catechizingId: true,
-                id: true,
-                hasReceivedBooklet: true,
-                toBePaid: true,
-                installments: true,
-              },
-            },
-            parents: true,
-          },
-        },
-        id: true,
-        segment: true,
-        startedAt: true,
-        roomNumber: true,
-        catechists: true,
-      },
     })
 
     return response.map(ClassroomMapper.toDomain)
   }
   async update(classroom: Classroom): Promise<void> {
-    const data = ClassroomMapper.toPrisma(classroom)
+    const { id, ...data } = ClassroomMapper.toPrisma(classroom)
 
-    const currentCatechists = await this.db.classroom
-      .findUnique({
-        where: { id: data.id },
-        select: { catechists: { select: { id: true } } },
-      })
-      .catechists()
-
-    const currentCatechistIds = currentCatechists!.map(
-      catechist => catechist.id
-    )
-
-    const catechistsToDisconnect = currentCatechistIds.filter(
-      id =>
-        !classroom.catechists.map(catechist => catechist.id.toString() === id)
-    )
+    // `set` substitui os catequistas da turma pelos informados
     await this.db.classroom.update({
-      where: { id: data.id },
+      where: { id },
       data: {
-        roomNumber: data.roomNumber,
-        segment: data.segment,
+        ...data,
         catechists: {
-          connect: data.catechists.map(catechist => ({ id: catechist.id })),
-          disconnect: catechistsToDisconnect.map(id => ({ id })),
+          set: classroom.catechists.map(catechist => ({
+            id: catechist.id.toString(),
+          })),
         },
-        startedAt: data.startedAt,
       },
     })
   }

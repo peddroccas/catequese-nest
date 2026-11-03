@@ -1,8 +1,6 @@
-import { IsArray, IsEnum, IsNumber, IsUUID, Min } from 'class-validator'
+import { IsArray, IsEnum, IsInt, IsNumber, IsUUID, Min } from 'class-validator'
 import { Segment } from '../../enums/segment'
-import dayjs from 'dayjs'
 
-const currentYear = dayjs().year()
 export class UpdateClassroomRequestDto {
   @IsUUID()
   id: string
@@ -13,8 +11,9 @@ export class UpdateClassroomRequestDto {
   @IsEnum(Segment)
   segment: Segment
 
-  @IsNumber()
-  @Min(currentYear)
+  // Turmas antigas continuam editáveis, por isso não exige o ano atual
+  @IsInt()
+  @Min(2023)
   startedAt: number
 
   @IsArray()
