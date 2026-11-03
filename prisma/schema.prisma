@@ -38,6 +38,9 @@ model Catechist {
   classrooms           Classroom[]
   formationAttendances FormationAttendance[]
 
+  // Preenchido quando o catequista vai para o arquivo
+  archivedAt DateTime?
+
   @@map("catechists")
 }
 
@@ -63,6 +66,9 @@ model Catechizing {
   classroom   Classroom? @relation(fields: [classroomId], references: [id], onDelete: Cascade)
   classroomId String
 
+  // Preenchido quando o catequizando vai para o arquivo
+  archivedAt DateTime?
+
   @@map("catechizings")
 }
 
@@ -86,6 +92,9 @@ model Classroom {
 
   catechists   Catechist[]
   catechizings Catechizing[]
+
+  // Preenchido quando a turma vai para o arquivo
+  archivedAt DateTime?
 
   @@map("classrooms")
 }

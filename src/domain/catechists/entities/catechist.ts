@@ -19,6 +19,7 @@ export interface CatechistProps {
 
   email: string
   password_hash: string
+  archivedAt?: Date | null
 }
 
 export class Catechist extends Entity<CatechistProps> {
@@ -72,6 +73,11 @@ export class Catechist extends Entity<CatechistProps> {
 
   get passwordHash(): string {
     return this.props.password_hash
+  }
+
+  // Data em que foi para o arquivo; null enquanto está ativo
+  get archivedAt(): Date | null {
+    return this.props.archivedAt ?? null
   }
 
   static create(props: CatechistProps, id?: UniqueEntityID) {

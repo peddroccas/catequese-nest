@@ -1,4 +1,8 @@
 import { Either } from '@/core/either'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 
-export type DeleteClassroomResponseDto = Either<ResourceNotFoundError, null>
+export type DeleteClassroomResponseDto = Either<
+  ResourceNotFoundError | NotAllowedError,
+  null
+>

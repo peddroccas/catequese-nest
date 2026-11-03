@@ -8,7 +8,12 @@ import { FetchAllClassroomsUseCase } from '@/domain/classroms/use-cases/fetch-al
 import { FetchClassroomByIdUseCase } from '@/domain/classroms/use-cases/fetch-classroom-by-id.use-case'
 import { UpdateClassroomUseCase } from '@/domain/classroms/use-cases/update-classroom.use-case'
 import { Roles } from '@/infra/auth/roles.decorator'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
+import { ArchiveClassroomUseCase } from '@/domain/classroms/use-cases/archive-classroom.use-case'
+import { RestoreClassroomUseCase } from '@/domain/classroms/use-cases/restore-classroom.use-case'
+import { FetchArchivedClassroomsUseCase } from '@/domain/classroms/use-cases/fetch-archived-classrooms.use-case'
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -17,6 +22,7 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -31,7 +37,10 @@ export class ClassroomController {
     private updateClassroom: UpdateClassroomUseCase,
     private deleteClassroom: DeleteClassroomUseCase,
     private fetchAllClassrooms: FetchAllClassroomsUseCase,
-    private fetchClassroomById: FetchClassroomByIdUseCase
+    private fetchClassroomById: FetchClassroomByIdUseCase,
+    private archiveClassroom: ArchiveClassroomUseCase,
+    private restoreClassroom: RestoreClassroomUseCase,
+    private fetchArchivedClassrooms: FetchArchivedClassroomsUseCase
   ) {}
 
   @Post()
@@ -58,6 +67,50 @@ export class ClassroomController {
     )
 
     return response.value?.classrooms.map(ClassroomPresenter.toHTTP)
+  }
+
+  @Get('/archived')
+  @Roles([Role.COORDINATOR])
+  async fetchArchived() {
+    const response = await this.fetchArchivedClassrooms.execute()
+
+    return response.value?.classrooms.map(ClassroomPresenter.toHTTP)
+  }
+
+  @Patch('/:id/archive')
+  @Roles([Role.COORDINATOR])
+  @HttpCode(204)
+  async archive(@Param('id', ParseUUIDPipe) id: string) {
+    const response = await this.archiveClassroom.execute(id)
+
+    if (response.isLeft()) {
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException('A turma já está arquivada')
+        default:
+          throw new NotFoundException()
+      }
+    }
+  }
+
+  @Patch('/:id/restore')
+  @Roles([Role.COORDINATOR])
+  @HttpCode(204)
+  async restore(@Param('id', ParseUUIDPipe) id: string) {
+    const response = await this.restoreClassroom.execute(id)
+
+    if (response.isLeft()) {
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException('A turma não está arquivada')
+        default:
+          throw new NotFoundException()
+      }
+    }
   }
 
   @Get('/:id')
@@ -92,7 +145,14 @@ export class ClassroomController {
     const response = await this.deleteClassroom.execute(id)
 
     if (response.isLeft()) {
-      throw new NotFoundException()
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException('Arquive a turma antes de excluir')
+        default:
+          throw new NotFoundException()
+      }
     }
   }
 }

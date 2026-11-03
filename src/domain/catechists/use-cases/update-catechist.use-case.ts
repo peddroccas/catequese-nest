@@ -33,7 +33,7 @@ export class UpdateCatechistUseCase {
   }: UpdateCatechistRequestDto): Promise<UpdateCatechistResponseDto> {
     const currentCatechist = await this.catechistRepository.findById(id)
 
-    if (!currentCatechist) {
+    if (!currentCatechist || currentCatechist.archivedAt) {
       return left(new ResourceNotFoundError())
     }
 

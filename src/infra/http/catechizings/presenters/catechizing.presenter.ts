@@ -19,6 +19,7 @@ export class CatechizingPresenter {
       hasReceivedMarriage: catechizing.hasReceivedMarriage,
       classroomId: catechizing.classroomId.toString(),
       parents: catechizing.parents.map(ParentPresenter.toHTTP),
+      archivedAt: catechizing.archivedAt?.toISOString() ?? null,
     }
   }
 }

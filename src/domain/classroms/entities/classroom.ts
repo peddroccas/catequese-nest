@@ -11,6 +11,7 @@ export interface ClassroomProps {
   startedAt: number
   catechists: Catechist[]
   catechizings: Catechizing[]
+  archivedAt?: Date | null
 }
 
 export class Classroom extends Entity<ClassroomProps> {
@@ -32,6 +33,11 @@ export class Classroom extends Entity<ClassroomProps> {
 
   get catechizings(): Catechizing[] {
     return this.props.catechizings
+  }
+
+  // Data em que foi para o arquivo; null enquanto está ativo
+  get archivedAt(): Date | null {
+    return this.props.archivedAt ?? null
   }
 
   static create(props: ClassroomProps, id?: UniqueEntityID) {

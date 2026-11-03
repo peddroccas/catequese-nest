@@ -22,7 +22,7 @@ export class AuthenticateCatechistUseCase {
   }: AuthenticateCatechistRequestDto): Promise<AuthenticateCatechistResponseDto> {
     const catechist = await this.catechistRepository.findByEmail(email)
 
-    if (!catechist) {
+    if (!catechist || catechist.archivedAt) {
       return left(new WrongCredentialsError())
     }
 

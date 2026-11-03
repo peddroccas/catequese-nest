@@ -16,6 +16,9 @@ import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { Public } from '@/infra/auth/public'
 import { Roles } from '@/infra/auth/roles.decorator'
+import { ArchiveCatechistUseCase } from '@/domain/catechists/use-cases/archive-catechist.use-case'
+import { RestoreCatechistUseCase } from '@/domain/catechists/use-cases/restore-catechist.use-case'
+import { FetchArchivedCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-archived-catechists.use-case'
 import { UserPayload } from '@/infra/auth/token.dto'
 import {
   BadRequestException,
@@ -45,7 +48,10 @@ export class CatechistController {
     private fetchCatechistById: FetchCatechistByIdUseCase,
     private updateCatechist: UpdateCatechistUseCase,
     private updatePassword: UpdatePasswordUseCase,
-    private resetCatechistPassword: ResetCatechistPasswordUseCase
+    private resetCatechistPassword: ResetCatechistPasswordUseCase,
+    private archiveCatechist: ArchiveCatechistUseCase,
+    private restoreCatechist: RestoreCatechistUseCase,
+    private fetchArchivedCatechists: FetchArchivedCatechistsUseCase
   ) {}
 
   @Post()
@@ -138,6 +144,55 @@ export class CatechistController {
     }
   }
 
+  @Get('/archived')
+  @Roles([Role.COORDINATOR])
+  async fetchArchived() {
+    const response = await this.fetchArchivedCatechists.execute()
+
+    return response.value?.catechists.map(CatechistPresenter.toHTTP)
+  }
+
+  @Patch('/:id/archive')
+  @Roles([Role.COORDINATOR])
+  @HttpCode(204)
+  async archive(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserPayload
+  ) {
+    const response = await this.archiveCatechist.execute(id, user.sub)
+
+    if (response.isLeft()) {
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException(
+            'Não é possível arquivar este catequista'
+          )
+        default:
+          throw new NotFoundException()
+      }
+    }
+  }
+
+  @Patch('/:id/restore')
+  @Roles([Role.COORDINATOR])
+  @HttpCode(204)
+  async restore(@Param('id', ParseUUIDPipe) id: string) {
+    const response = await this.restoreCatechist.execute(id)
+
+    if (response.isLeft()) {
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException('O catequista não está arquivado')
+        default:
+          throw new NotFoundException()
+      }
+    }
+  }
+
   @Get('/:id')
   async fetchById(@Param('id', ParseUUIDPipe) id: string) {
     const response = await this.fetchCatechistById.execute(id)
@@ -176,7 +231,14 @@ export class CatechistController {
     const response = await this.deleteCatechist.execute(id)
 
     if (response.isLeft()) {
-      throw new NotFoundException()
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException('Arquive o catequista antes de excluir')
+        default:
+          throw new NotFoundException()
+      }
     }
   }
 }

@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common'
+import { ArchiveCatechistUseCase } from '@/domain/catechists/use-cases/archive-catechist.use-case'
+import { RestoreCatechistUseCase } from '@/domain/catechists/use-cases/restore-catechist.use-case'
+import { FetchArchivedCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-archived-catechists.use-case'
 import { CatechistController } from './controllers/catechist.controller'
 import { CreateCatechistUseCase } from '@/domain/catechists/use-cases/create-catechist.use-case'
 import { AuthenticateCatechistUseCase } from '@/domain/catechists/use-cases/authenticate-catechist.use-case'
@@ -20,6 +23,9 @@ import { ResetCatechistPasswordUseCase } from '@/domain/catechists/use-cases/res
     UpdateCatechistUseCase,
     UpdatePasswordUseCase,
     ResetCatechistPasswordUseCase,
+    ArchiveCatechistUseCase,
+    RestoreCatechistUseCase,
+    FetchArchivedCatechistsUseCase,
   ],
 })
 export class CatechistModule {}

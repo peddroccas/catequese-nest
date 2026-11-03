@@ -11,5 +11,8 @@ export abstract class CatechistRepository {
   abstract findByEmail(email: string): Promise<Catechist | null>
   abstract findByClassroom(classroomId: string): Promise<Catechist[]>
   abstract findMany(): Promise<Catechist[]>
+  abstract findManyArchived(): Promise<Catechist[]>
+  abstract archive(id: string): Promise<void>
+  abstract restore(id: string): Promise<void>
   abstract update(catechist: Catechist): Promise<void>
 }

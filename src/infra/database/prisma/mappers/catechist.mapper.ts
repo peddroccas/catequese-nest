@@ -24,12 +24,14 @@ export class CatechistMapper {
         classroomIds: (raw.classrooms ?? []).map(
           classroom => new UniqueEntityID(classroom.id)
         ),
+        archivedAt: raw.archivedAt,
       },
       new UniqueEntityID(raw.id)
     )
   }
 
-  static toPrisma(catechist: Catechist): PrismaCatechist {
+  // archivedAt só muda pelos métodos archive/restore do repositório
+  static toPrisma(catechist: Catechist): Omit<PrismaCatechist, 'archivedAt'> {
     return {
       address: catechist.address,
       birthday: catechist.birthday,

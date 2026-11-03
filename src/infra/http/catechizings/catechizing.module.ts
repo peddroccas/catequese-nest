@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common'
+import { ArchiveCatechizingUseCase } from '@/domain/catechizings/use-cases/archive-catechizing.use-case'
+import { RestoreCatechizingUseCase } from '@/domain/catechizings/use-cases/restore-catechizing.use-case'
+import { FetchArchivedCatechizingsUseCase } from '@/domain/catechizings/use-cases/fetch-archived-catechizings.use-case'
 import { CatechizingController } from './controllers/catechizing.controller'
 import { CreateCatechizingUseCase } from '@/domain/catechizings/use-cases/create-catechizing.use-case'
 import { UpdateCatechizingUseCase } from '@/domain/catechizings/use-cases/update-catechizing.use-case'
@@ -16,6 +19,9 @@ import { FetchCatechizingByClassroomUseCase } from '@/domain/catechizings/use-ca
     DeleteCatechizingUseCase,
     FetchAllCatechizingsUseCase,
     FetchCatechizingByClassroomUseCase,
+    ArchiveCatechizingUseCase,
+    RestoreCatechizingUseCase,
+    FetchArchivedCatechizingsUseCase,
   ],
 })
 export class CatechizingModule {}

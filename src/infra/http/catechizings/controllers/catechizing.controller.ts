@@ -10,6 +10,11 @@ import { TransferCatechizingUseCase } from '@/domain/catechizings/use-cases/tran
 import { UpdateCatechizingUseCase } from '@/domain/catechizings/use-cases/update-catechizing.use-case'
 import { ParentRequiredError } from '@/domain/catechizings/use-cases/errors/parent-required-error'
 import { Roles } from '@/infra/auth/roles.decorator'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
+import { ArchiveCatechizingUseCase } from '@/domain/catechizings/use-cases/archive-catechizing.use-case'
+import { RestoreCatechizingUseCase } from '@/domain/catechizings/use-cases/restore-catechizing.use-case'
+import { FetchArchivedCatechizingsUseCase } from '@/domain/catechizings/use-cases/fetch-archived-catechizings.use-case'
+import { RestoreCatechizingRequestDto } from '@/domain/catechizings/dtos/request/restore-catechizing.dto'
 import {
   BadRequestException,
   Body,
@@ -34,7 +39,10 @@ export class CatechizingController {
     private transferCatechizing: TransferCatechizingUseCase,
     private deleteCatechizing: DeleteCatechizingUseCase,
     private fetchAllCatechizings: FetchAllCatechizingsUseCase,
-    private fetchCatechizingByClassroom: FetchCatechizingByClassroomUseCase
+    private fetchCatechizingByClassroom: FetchCatechizingByClassroomUseCase,
+    private archiveCatechizing: ArchiveCatechizingUseCase,
+    private restoreCatechizing: RestoreCatechizingUseCase,
+    private fetchArchivedCatechizings: FetchArchivedCatechizingsUseCase
   ) {}
 
   @Post()
@@ -66,6 +74,56 @@ export class CatechizingController {
     const response = await this.fetchAllCatechizings.execute()
 
     return response.value?.catechizings.map(CatechizingPresenter.toHTTP)
+  }
+
+  @Get('/archived')
+  @Roles([Role.COORDINATOR])
+  async fetchArchived() {
+    const response = await this.fetchArchivedCatechizings.execute()
+
+    return response.value?.catechizings.map(CatechizingPresenter.toHTTP)
+  }
+
+  @Patch('/:id/archive')
+  @Roles([Role.COORDINATOR])
+  @HttpCode(204)
+  async archive(@Param('id', ParseUUIDPipe) id: string) {
+    const response = await this.archiveCatechizing.execute(id)
+
+    if (response.isLeft()) {
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException('O catequizando já está arquivado')
+        default:
+          throw new NotFoundException()
+      }
+    }
+  }
+
+  @Patch('/:id/restore')
+  @Roles([Role.COORDINATOR])
+  @HttpCode(204)
+  async restore(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() restoreCatechizingRequestDto: RestoreCatechizingRequestDto
+  ) {
+    const response = await this.restoreCatechizing.execute(
+      id,
+      restoreCatechizingRequestDto
+    )
+
+    if (response.isLeft()) {
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException('O catequizando não está arquivado')
+        default:
+          throw new NotFoundException()
+      }
+    }
   }
 
   @Get('/classroom/:classroomId')
@@ -134,7 +192,16 @@ export class CatechizingController {
     const response = await this.deleteCatechizing.execute(id)
 
     if (response.isLeft()) {
-      throw new NotFoundException()
+      const error = response.value
+
+      switch (error.constructor) {
+        case NotAllowedError:
+          throw new BadRequestException(
+            'Arquive o catequizando antes de excluir'
+          )
+        default:
+          throw new NotFoundException()
+      }
     }
   }
 }

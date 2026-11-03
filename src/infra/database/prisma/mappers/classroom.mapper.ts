@@ -24,12 +24,14 @@ export class ClassroomMapper {
         location: raw.location,
         segment: raw.segment as Segment,
         startedAt: raw.startedAt,
+        archivedAt: raw.archivedAt,
       },
       new UniqueEntityID(raw.id)
     )
   }
 
-  static toPrisma(classroom: Classroom): PrismaClassroom {
+  // archivedAt só muda pelos métodos archive/restore do repositório
+  static toPrisma(classroom: Classroom): Omit<PrismaClassroom, 'archivedAt'> {
     return {
       id: classroom.id.toString(),
       location: classroom.location,

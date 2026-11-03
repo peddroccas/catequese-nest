@@ -49,6 +49,7 @@ export class PrismaCatechizingRepository implements CatechizingRepository {
   }
   async findMany(): Promise<Catechizing[]> {
     const response = await this.db.catechizing.findMany({
+      where: { archivedAt: null, classroom: { archivedAt: null } },
       include: { parents: true },
       orderBy: { name: 'asc' },
     })
@@ -57,12 +58,33 @@ export class PrismaCatechizingRepository implements CatechizingRepository {
   }
   async findByClassroom(classroomId: string): Promise<Catechizing[]> {
     const response = await this.db.catechizing.findMany({
-      where: { classroomId },
+      where: { classroomId, archivedAt: null },
       include: { parents: true },
       orderBy: { name: 'asc' },
     })
 
     return response.map(CatechizingMapper.toDomain)
+  }
+  async findManyArchived(): Promise<Catechizing[]> {
+    const response = await this.db.catechizing.findMany({
+      where: { archivedAt: { not: null } },
+      include: { parents: true },
+      orderBy: { archivedAt: 'desc' },
+    })
+
+    return response.map(CatechizingMapper.toDomain)
+  }
+  async archive(id: string): Promise<void> {
+    await this.db.catechizing.update({
+      where: { id },
+      data: { archivedAt: new Date() },
+    })
+  }
+  async restore(id: string, classroomId: string): Promise<void> {
+    await this.db.catechizing.update({
+      where: { id },
+      data: { archivedAt: null, classroomId },
+    })
   }
   async update(catechizing: Catechizing): Promise<Catechizing> {
     const { id, ...data } = CatechizingMapper.toPrisma(catechizing)

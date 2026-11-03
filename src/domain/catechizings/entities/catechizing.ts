@@ -14,6 +14,7 @@ export interface CatechizingProps {
   // Só preenchidos em turmas de adultos
   maritalStatus: MaritalStatus | null
   livesWithPartner: boolean | null
+  archivedAt?: Date | null
 
   hasReceivedBaptism: boolean
   hasReceivedEucharist: boolean
@@ -74,6 +75,11 @@ export class Catechizing extends Entity<CatechizingProps> {
 
   get livesWithPartner(): boolean | null {
     return this.props.livesWithPartner
+  }
+
+  // Data em que foi para o arquivo; null enquanto está ativo
+  get archivedAt(): Date | null {
+    return this.props.archivedAt ?? null
   }
 
   static create(props: CatechizingProps, id?: UniqueEntityID) {

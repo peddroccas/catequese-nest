@@ -26,12 +26,16 @@ export class CatechizingMapper {
         specialNeedsDescription: raw.specialNeedsDescription,
         maritalStatus: raw.maritalStatus as MaritalStatus | null,
         livesWithPartner: raw.livesWithPartner,
+        archivedAt: raw.archivedAt,
       },
       new UniqueEntityID(raw.id)
     )
   }
 
-  static toPrisma(catechizing: Catechizing): PrismaCatechizing {
+  // archivedAt só muda pelos métodos archive/restore do repositório
+  static toPrisma(
+    catechizing: Catechizing
+  ): Omit<PrismaCatechizing, 'archivedAt'> {
     return {
       address: catechizing.address,
       birthday: catechizing.birthday,

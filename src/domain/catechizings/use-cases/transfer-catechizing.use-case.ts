@@ -22,13 +22,13 @@ export class TransferCatechizingUseCase {
   }: TransferCatechizingRequestDto): Promise<TransferCatechizingResponseDto> {
     const currentCatechizing = await this.catechizingRepository.findById(id)
 
-    if (!currentCatechizing) {
+    if (!currentCatechizing || currentCatechizing.archivedAt) {
       return left(new ResourceNotFoundError())
     }
 
     const classroom = await this.classroomRepository.findById(classroomId)
 
-    if (!classroom) {
+    if (!classroom || classroom.archivedAt) {
       return left(new ResourceNotFoundError())
     }
 

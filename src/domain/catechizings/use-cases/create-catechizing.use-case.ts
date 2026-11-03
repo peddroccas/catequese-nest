@@ -35,7 +35,7 @@ export class CreateCatechizingUseCase {
   }: CreateCatechizingRequestDto): Promise<CreateCatechizingResponseDto> {
     const classroom = await this.classroomRepository.findById(classroomId)
 
-    if (!classroom) {
+    if (!classroom || classroom.archivedAt) {
       return left(new ResourceNotFoundError())
     }
 

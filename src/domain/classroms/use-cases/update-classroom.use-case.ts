@@ -25,7 +25,7 @@ export class UpdateClassroomUseCase {
   }: UpdateClassroomRequestDto): Promise<UpdateClassroomResponseDto> {
     const currentClassroom = await this.classroomRepository.findById(id)
 
-    if (!currentClassroom) {
+    if (!currentClassroom || currentClassroom.archivedAt) {
       return left(new ResourceNotFoundError())
     }
 
