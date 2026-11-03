@@ -23,7 +23,7 @@ model Catechist {
   name     String
   nickname String   @default("")
   role     Role     @default(MEMBER)
-  birthday DateTime
+  birthday DateTime @db.Date
   phone    String
   address  String
 
@@ -44,7 +44,7 @@ model Catechist {
 model Catechizing {
   id                     String   @id @default(uuid())
   name                   String
-  birthday               DateTime
+  birthday               DateTime @db.Date
   address                String
   personWithSpecialNeeds Boolean
   releasedToGoAwayAlone  Boolean  @default(false)
@@ -84,3 +84,4 @@ model Classroom {
 
   @@map("classrooms")
 }
+

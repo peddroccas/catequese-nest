@@ -1,4 +1,5 @@
 import { Catechist } from '@/domain/catechists/entities/catechist'
+import { toDateOnly } from '../../presenters/date.presenter'
 
 export class CatechistPresenter {
   static toHTTP(catechist: Catechist) {
@@ -7,7 +8,7 @@ export class CatechistPresenter {
       name: catechist.name,
       nickname: catechist.nickname,
       role: catechist.role,
-      birthday: catechist.birthday,
+      birthday: toDateOnly(catechist.birthday),
       phone: catechist.phone,
       address: catechist.address,
       email: catechist.email,
