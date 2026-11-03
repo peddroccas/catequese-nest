@@ -2,18 +2,34 @@ import { Classroom } from '@/domain/classroms/entities/classroom'
 import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
 import { Segment } from '@/domain/classroms/enums/segment'
 import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma.service'
 import { ClassroomMapper } from '../mappers/classroom.mapper'
 
 const classroomInclude = {
   catechists: { orderBy: { name: 'asc' } },
-  // Catequizandos arquivados individualmente ficam fora da turma
   catechizings: {
-    where: { archivedAt: null },
     include: { parents: true },
     orderBy: { name: 'asc' },
   },
 } as const
+
+type PrismaClassroomWithRelations = Prisma.ClassroomGetPayload<{
+  include: typeof classroomInclude
+}>
+
+// Turma ativa mostra os catequizandos ativos; turma arquivada mostra os que
+// foram arquivados junto com ela (mesmo archivedAt). Quem foi arquivado
+// sozinho fica de fora nos dois casos.
+function toDomain(raw: PrismaClassroomWithRelations) {
+  return ClassroomMapper.toDomain({
+    ...raw,
+    catechizings: raw.catechizings.filter(
+      catechizing =>
+        catechizing.archivedAt?.getTime() === raw.archivedAt?.getTime()
+    ),
+  })
+}
 
 @Injectable()
 export class PrismaClassroomRepository implements ClassroomRepository {
@@ -46,7 +62,7 @@ export class PrismaClassroomRepository implements ClassroomRepository {
       return null
     }
 
-    return ClassroomMapper.toDomain(response)
+    return toDomain(response)
   }
   async exists(id: string): Promise<boolean> {
     const count = await this.db.classroom.count({
@@ -62,7 +78,7 @@ export class PrismaClassroomRepository implements ClassroomRepository {
       orderBy: { location: 'asc' },
     })
 
-    return response.map(ClassroomMapper.toDomain)
+    return response.map(toDomain)
   }
   async findManyArchived(): Promise<Classroom[]> {
     const response = await this.db.classroom.findMany({
@@ -71,19 +87,34 @@ export class PrismaClassroomRepository implements ClassroomRepository {
       orderBy: { archivedAt: 'desc' },
     })
 
-    return response.map(ClassroomMapper.toDomain)
+    return response.map(toDomain)
   }
+  // Os catequizandos ativos vão para o arquivo junto, com a mesma data
   async archive(id: string): Promise<void> {
-    await this.db.classroom.update({
-      where: { id },
-      data: { archivedAt: new Date() },
-    })
+    const archivedAt = new Date()
+
+    await this.db.$transaction([
+      this.db.classroom.update({ where: { id }, data: { archivedAt } }),
+      this.db.catechizing.updateMany({
+        where: { classroomId: id, archivedAt: null },
+        data: { archivedAt },
+      }),
+    ])
   }
+  // Voltam só os catequizandos que foram arquivados junto com a turma
   async restore(id: string): Promise<void> {
-    await this.db.classroom.update({
+    const classroom = await this.db.classroom.findUniqueOrThrow({
       where: { id },
-      data: { archivedAt: null },
+      select: { archivedAt: true },
     })
+
+    await this.db.$transaction([
+      this.db.classroom.update({ where: { id }, data: { archivedAt: null } }),
+      this.db.catechizing.updateMany({
+        where: { classroomId: id, archivedAt: classroom.archivedAt },
+        data: { archivedAt: null },
+      }),
+    ])
   }
   async update(classroom: Classroom): Promise<void> {
     const { id, ...data } = ClassroomMapper.toPrisma(classroom)
