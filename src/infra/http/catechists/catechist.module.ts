@@ -7,6 +7,7 @@ import { FetchAllCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-a
 import { FetchCatechistByIdUseCase } from '@/domain/catechists/use-cases/fetch-catechist-by-id.use-case'
 import { UpdateCatechistUseCase } from '@/domain/catechists/use-cases/update-catechist.use-case'
 import { UpdatePasswordUseCase } from '@/domain/catechists/use-cases/update-catechist-password.use-case'
+import { ResetCatechistPasswordUseCase } from '@/domain/catechists/use-cases/reset-catechist-password.use-case'
 
 @Module({
   controllers: [CatechistController],
@@ -18,6 +19,7 @@ import { UpdatePasswordUseCase } from '@/domain/catechists/use-cases/update-cate
     FetchCatechistByIdUseCase,
     UpdateCatechistUseCase,
     UpdatePasswordUseCase,
+    ResetCatechistPasswordUseCase,
   ],
 })
 export class CatechistModule {}

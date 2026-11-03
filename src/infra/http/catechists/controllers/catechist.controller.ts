@@ -8,6 +8,7 @@ import { CreateCatechistUseCase } from '@/domain/catechists/use-cases/create-cat
 import { DeleteCatechistUseCase } from '@/domain/catechists/use-cases/delete-catechist.use-case'
 import { FetchAllCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-all-catechists.use-case'
 import { FetchCatechistByIdUseCase } from '@/domain/catechists/use-cases/fetch-catechist-by-id.use-case'
+import { ResetCatechistPasswordUseCase } from '@/domain/catechists/use-cases/reset-catechist-password.use-case'
 import { UpdatePasswordUseCase } from '@/domain/catechists/use-cases/update-catechist-password.use-case'
 import { UpdateCatechistUseCase } from '@/domain/catechists/use-cases/update-catechist.use-case'
 import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
@@ -43,7 +44,8 @@ export class CatechistController {
     private fetchAllCatechists: FetchAllCatechistsUseCase,
     private fetchCatechistById: FetchCatechistByIdUseCase,
     private updateCatechist: UpdateCatechistUseCase,
-    private updatePassword: UpdatePasswordUseCase
+    private updatePassword: UpdatePasswordUseCase,
+    private resetCatechistPassword: ResetCatechistPasswordUseCase
   ) {}
 
   @Post()
@@ -122,6 +124,17 @@ export class CatechistController {
         default:
           throw new NotFoundException(error.message)
       }
+    }
+  }
+
+  @Patch('/:id/password/reset')
+  @Roles([Role.COORDINATOR])
+  @HttpCode(204)
+  async resetPassword(@Param('id', ParseUUIDPipe) id: string) {
+    const response = await this.resetCatechistPassword.execute(id)
+
+    if (response.isLeft()) {
+      throw new NotFoundException()
     }
   }
 
