@@ -1,9 +1,9 @@
 import { Either } from '@/core/either'
+import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
 import { Catechist } from '../../entities/catechist'
-import { WrongCredentialsError } from '../../use-cases/errors/wrog-credentials-error'
 
 export type CreateCatechistResponseDto = Either<
-  WrongCredentialsError,
+  DuplicatedError,
   {
     catechist: Catechist
   }

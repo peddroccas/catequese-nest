@@ -3,7 +3,7 @@ import { HashGenerator } from '../cryptography/hash-generator'
 import { left, right } from '@/core/either'
 import { CatechistRepository } from '../repositories/catechist.repository'
 import { UpdateCatechistPasswordRequestDto } from '../dtos/request/update-catechist-password.dto'
-import { UpdateCatechistResponseDto } from '../dtos/response/update-catechist.dto'
+import { UpdateCatechistPasswordResponseDto } from '../dtos/response/update-catechist-password.dto'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 import { Catechist } from '../entities/catechist'
 
@@ -14,10 +14,10 @@ export class UpdatePasswordUseCase {
     private hashGenerator: HashGenerator
   ) {}
 
-  async execute({
-    id,
-    password,
-  }: UpdateCatechistPasswordRequestDto): Promise<UpdateCatechistResponseDto> {
+  async execute(
+    id: string,
+    { password }: UpdateCatechistPasswordRequestDto
+  ): Promise<UpdateCatechistPasswordResponseDto> {
     const currentUser = await this.catechistRepository.findById(id)
 
     if (!currentUser) {

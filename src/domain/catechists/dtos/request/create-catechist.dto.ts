@@ -3,11 +3,11 @@ import {
   IsDate,
   IsEmail,
   IsEnum,
-  IsISO8601,
   IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator'
+import { Transform, Type } from 'class-transformer'
 import { Role } from '../../enums/role'
 
 export class CreateCatechistRequestDto {
@@ -17,7 +17,8 @@ export class CreateCatechistRequestDto {
   @IsString()
   nickname: string
 
-  @IsISO8601()
+  @Type(() => Date)
+  @IsDate()
   birthday: Date
 
   @IsString()
@@ -26,6 +27,7 @@ export class CreateCatechistRequestDto {
   @IsString()
   address: string
 
+  @Transform(({ value }) => value?.toLowerCase())
   @IsEmail()
   email: string
 

@@ -7,6 +7,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator'
+import { Transform, Type } from 'class-transformer'
 import { Role } from '../../enums/role'
 
 export class UpdateCatechistRequestDto {
@@ -19,6 +20,7 @@ export class UpdateCatechistRequestDto {
   @IsString()
   nickname: string
 
+  @Type(() => Date)
   @IsDate()
   birthday: Date
 
@@ -28,6 +30,7 @@ export class UpdateCatechistRequestDto {
   @IsString()
   address: string
 
+  @Transform(({ value }) => value?.toLowerCase())
   @IsEmail()
   email: string
 

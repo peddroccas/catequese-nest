@@ -1,9 +1,7 @@
-import { IsString, IsUUID } from 'class-validator'
+import { IsString, MinLength } from 'class-validator'
 
 export class UpdateCatechistPasswordRequestDto {
-  @IsUUID()
-  id: string
-
   @IsString()
+  @MinLength(6)
   password: string
 }

@@ -3,5 +3,5 @@ import { Catechist } from '../../entities/catechist'
 
 export type FetchAllCatechistsResponseDto = Either<
   null,
-  { catechists: Catechist[] | null }
+  { catechists: Catechist[] }
 >

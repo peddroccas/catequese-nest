@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { HashGenerator } from '../cryptography/hash-generator'
 import { CatechistRepository } from '../repositories/catechist.repository'
 import { left, right } from '@/core/either'
 import { Catechist } from '../entities/catechist'
@@ -11,10 +10,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 @Injectable()
 export class UpdateCatechistUseCase {
-  constructor(
-    private catechistRepository: CatechistRepository,
-    private hashGenerator: HashGenerator
-  ) {}
+  constructor(private catechistRepository: CatechistRepository) {}
 
   async execute({
     id,
@@ -58,7 +54,7 @@ export class UpdateCatechistUseCase {
         phone,
         role,
         password_hash: currentCatechist.passwordHash,
-        classroomId: new UniqueEntityID(classroomId),
+        classroomId: classroomId ? new UniqueEntityID(classroomId) : null,
       },
       currentCatechist.id
     )

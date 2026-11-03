@@ -19,7 +19,9 @@ export class CatechistMapper {
         password_hash: raw.password_hash,
         phone: raw.phone,
         role: Role[raw.role],
-        classroomId: new UniqueEntityID(raw.classroomId!),
+        classroomId: raw.classroomId
+          ? new UniqueEntityID(raw.classroomId)
+          : null,
       },
       new UniqueEntityID(raw.id)
     )
