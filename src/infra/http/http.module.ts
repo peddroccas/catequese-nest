@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
-import { CatechistController } from './catechists/controllers/catechist.controller'
-import { CreateCatechistUseCase } from '@/domain/catechists/use-cases/create-catechist.use-case'
 import { CatechistModule } from './catechists/catechist.module'
+import { CatechizingModule } from './catechizings/catechizing.module'
+import { ClassroomModule } from './classrooms/classroom.module'
 
 @Module({
-  imports: [CatechistModule],
+  imports: [CatechistModule, CatechizingModule, ClassroomModule],
 })
 export class HttpModule {}
