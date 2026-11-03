@@ -25,13 +25,13 @@ export class CreateClassroomUseCase {
 
     for (const catechistId of catechistsId) {
       const catechist = await this.catechistRepository.findById(catechistId)
-      if (catechist) {
-        catechists.push(catechist)
-      }
-    }
 
-    if (!catechists.length) {
-      return left(new ResourceNotFoundError())
+      // A turma pode ficar sem catequistas, mas todo id informado precisa existir
+      if (!catechist) {
+        return left(new ResourceNotFoundError())
+      }
+
+      catechists.push(catechist)
     }
 
     const classroom = Classroom.create({

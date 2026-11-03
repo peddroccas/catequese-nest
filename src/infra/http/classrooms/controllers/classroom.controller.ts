@@ -43,7 +43,7 @@ export class ClassroomController {
     )
 
     if (response.isLeft()) {
-      throw new NotFoundException('Nenhum catequista encontrado')
+      throw new NotFoundException('Catequista não encontrado')
     }
 
     return ClassroomPresenter.toHTTP(response.value.classroom)
