@@ -69,6 +69,8 @@ model Catechizing {
   classroom   Classroom? @relation(fields: [classroomId], references: [id], onDelete: Cascade)
   classroomId String
 
+  meetingAttendances MeetingAttendance[]
+
   // Preenchido quando o catequizando vai para o arquivo
   archivedAt DateTime?
 
@@ -98,6 +100,7 @@ model Classroom {
 
   catechists   Catechist[]
   catechizings Catechizing[]
+  meetings     Meeting[]
 
   // Preenchido quando a turma vai para o arquivo
   archivedAt DateTime?
@@ -129,4 +132,53 @@ model FormationAttendance {
 
   @@unique([formationId, catechistId])
   @@map("formation_attendances")
+}
+
+// Tema de encontro do itinerário (Pré-Eucaristia, Eucaristia, Crisma, Adultos),
+// editável pela coordenação
+model MeetingTheme {
+  id        String @id @default(uuid())
+  itinerary String
+  // Tempo/fase do itinerário em que o tema aparece
+  phase     String
+  name      String
+  // Ordem dentro do itinerário
+  position  Int
+
+  meetings Meeting[]
+
+  // Temas excluídos somem da escolha, mas continuam no histórico das chamadas
+  archivedAt DateTime?
+
+  @@index([itinerary])
+  @@map("meeting_themes")
+}
+
+// Encontro de uma turma com a chamada dos catequizandos (um ou mais temas)
+model Meeting {
+  id   String   @id @default(uuid())
+  date DateTime @db.Date
+
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  classroomId String
+
+  themes      MeetingTheme[]
+  attendances MeetingAttendance[]
+
+  @@index([classroomId])
+  @@map("meetings")
+}
+
+model MeetingAttendance {
+  id        String  @id @default(uuid())
+  isPresent Boolean
+
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meetingId String
+
+  catechizing   Catechizing @relation(fields: [catechizingId], references: [id], onDelete: Cascade)
+  catechizingId String
+
+  @@unique([meetingId, catechizingId])
+  @@map("meeting_attendances")
 }

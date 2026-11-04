@@ -8,6 +8,10 @@ import { PrismaClassroomRepository } from './prisma/repositories/classroom.repos
 import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
 import { PrismaFormationRepository } from './prisma/repositories/formation.repository'
 import { FormationRepository } from '@/domain/formations/repositories/formation.repository'
+import { PrismaMeetingRepository } from './prisma/repositories/meeting.repository'
+import { MeetingRepository } from '@/domain/meetings/repositories/meeting.repository'
+import { PrismaMeetingThemeRepository } from './prisma/repositories/meeting-theme.repository'
+import { MeetingThemeRepository } from '@/domain/meetings/repositories/meeting-theme.repository'
 
 @Global()
 @Module({
@@ -30,6 +34,14 @@ import { FormationRepository } from '@/domain/formations/repositories/formation.
       provide: FormationRepository,
       useClass: PrismaFormationRepository,
     },
+    {
+      provide: MeetingRepository,
+      useClass: PrismaMeetingRepository,
+    },
+    {
+      provide: MeetingThemeRepository,
+      useClass: PrismaMeetingThemeRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -37,6 +49,8 @@ import { FormationRepository } from '@/domain/formations/repositories/formation.
     CatechizingRepository,
     ClassroomRepository,
     FormationRepository,
+    MeetingRepository,
+    MeetingThemeRepository,
   ],
 })
 export class DatabaseModule {}
