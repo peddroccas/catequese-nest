@@ -4,6 +4,7 @@ import { Attendance } from './attendance'
 
 export interface FormationProps {
   theme: string
+  instructor?: string | null
   date: Date
   attendances: Attendance[]
 }
@@ -11,6 +12,10 @@ export interface FormationProps {
 export class Formation extends Entity<FormationProps> {
   get theme(): string {
     return this.props.theme
+  }
+
+  get instructor(): string | null {
+    return this.props.instructor ?? null
   }
 
   get date(): Date {

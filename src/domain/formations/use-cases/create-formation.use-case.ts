@@ -18,6 +18,7 @@ export class CreateFormationUseCase {
 
   async execute({
     theme,
+    instructor,
     date,
     attendances,
   }: CreateFormationRequestDto): Promise<CreateFormationResponseDto> {
@@ -31,6 +32,7 @@ export class CreateFormationUseCase {
 
     const formation = Formation.create({
       theme,
+      instructor: instructor ?? null,
       date,
       attendances: attendances.map(attendance =>
         Attendance.create({

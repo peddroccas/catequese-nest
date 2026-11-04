@@ -6,6 +6,7 @@ export class FormationPresenter {
     return {
       id: formation.id.toString(),
       theme: formation.theme,
+      instructor: formation.instructor,
       date: toDateOnly(formation.date),
       attendances: formation.attendances.map(attendance => ({
         catechistId: attendance.catechistId.toString(),

@@ -13,6 +13,7 @@ export class FormationMapper {
     return Formation.create(
       {
         theme: raw.theme,
+        instructor: raw.instructor,
         date: raw.date,
         attendances: raw.attendances.map(attendance =>
           Attendance.create(
@@ -32,6 +33,7 @@ export class FormationMapper {
     return {
       id: formation.id.toString(),
       theme: formation.theme,
+      instructor: formation.instructor,
       date: formation.date,
     }
   }

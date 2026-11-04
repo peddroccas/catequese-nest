@@ -103,9 +103,11 @@ model Classroom {
 }
 
 model Formation {
-  id    String   @id @default(uuid())
-  theme String
-  date  DateTime @db.Date
+  id         String   @id @default(uuid())
+  theme      String
+  // Quem conduziu a formação (pode ser alguém de fora, como o padre)
+  instructor String?
+  date       DateTime @db.Date
 
   attendances FormationAttendance[]
 
