@@ -18,6 +18,7 @@ export class CatechistPresenter {
       hasReceivedMarriage: catechist.hasReceivedMarriage,
       classroomIds: catechist.classroomIds.map(id => id.toString()),
       archivedAt: catechist.archivedAt?.toISOString() ?? null,
+      avatarUrl: catechist.avatarUrl,
     }
   }
 }

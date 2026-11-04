@@ -15,4 +15,5 @@ export abstract class CatechistRepository {
   abstract archive(id: string): Promise<void>
   abstract restore(id: string): Promise<void>
   abstract update(catechist: Catechist): Promise<void>
+  abstract updateAvatar(id: string, avatarUrl: string | null): Promise<void>
 }

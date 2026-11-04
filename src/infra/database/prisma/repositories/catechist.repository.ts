@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../prisma.service'
-import { CatechistRepository } from '@/domain/catechists/repositories/catechist.repository'
 import { Catechist } from '@/domain/catechists/entities/catechist'
+import { CatechistRepository } from '@/domain/catechists/repositories/catechist.repository'
+import { Injectable } from '@nestjs/common'
 import { CatechistMapper } from '../mappers/catechist.mapper'
+import { PrismaService } from '../prisma.service'
 
 const catechistInclude = { classrooms: { select: { id: true } } } as const
 
@@ -70,6 +70,13 @@ export class PrismaCatechistRepository implements CatechistRepository {
     await this.db.catechist.update({
       where: { id },
       data: { archivedAt: null },
+    })
+  }
+
+  async updateAvatar(id: string, avatarUrl: string | null): Promise<void> {
+    await this.db.catechist.update({
+      where: { id },
+      data: { avatarUrl },
     })
   }
 

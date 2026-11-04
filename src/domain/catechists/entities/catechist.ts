@@ -20,6 +20,7 @@ export interface CatechistProps {
   email: string
   password_hash: string
   archivedAt?: Date | null
+  avatarUrl?: string | null
 }
 
 export class Catechist extends Entity<CatechistProps> {
@@ -78,6 +79,11 @@ export class Catechist extends Entity<CatechistProps> {
   // Data em que foi para o arquivo; null enquanto está ativo
   get archivedAt(): Date | null {
     return this.props.archivedAt ?? null
+  }
+
+  // URL pública da foto de perfil; null quando não tem foto
+  get avatarUrl(): string | null {
+    return this.props.avatarUrl ?? null
   }
 
   static create(props: CatechistProps, id?: UniqueEntityID) {

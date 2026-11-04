@@ -1,24 +1,26 @@
+import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { AuthenticateCatechistRequestDto } from '@/domain/catechists/dtos/request/authenticate-catechist.dto'
 import { CreateCatechistRequestDto } from '@/domain/catechists/dtos/request/create-catechist.dto'
 import { UpdateCatechistPasswordRequestDto } from '@/domain/catechists/dtos/request/update-catechist-password.dto'
 import { UpdateCatechistRequestDto } from '@/domain/catechists/dtos/request/update-catechist.dto'
 import { Role } from '@/domain/catechists/enums/role'
+import { AvatarStorage } from '@/domain/catechists/storage/avatar-storage'
+import { ArchiveCatechistUseCase } from '@/domain/catechists/use-cases/archive-catechist.use-case'
 import { AuthenticateCatechistUseCase } from '@/domain/catechists/use-cases/authenticate-catechist.use-case'
 import { CreateCatechistUseCase } from '@/domain/catechists/use-cases/create-catechist.use-case'
 import { DeleteCatechistUseCase } from '@/domain/catechists/use-cases/delete-catechist.use-case'
 import { FetchAllCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-all-catechists.use-case'
+import { FetchArchivedCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-archived-catechists.use-case'
 import { FetchCatechistByIdUseCase } from '@/domain/catechists/use-cases/fetch-catechist-by-id.use-case'
 import { ResetCatechistPasswordUseCase } from '@/domain/catechists/use-cases/reset-catechist-password.use-case'
+import { RestoreCatechistUseCase } from '@/domain/catechists/use-cases/restore-catechist.use-case'
+import { UpdateCatechistAvatarUseCase } from '@/domain/catechists/use-cases/update-catechist-avatar.use-case'
 import { UpdatePasswordUseCase } from '@/domain/catechists/use-cases/update-catechist-password.use-case'
 import { UpdateCatechistUseCase } from '@/domain/catechists/use-cases/update-catechist.use-case'
-import { DuplicatedError } from '@/core/errors/errors/duplicated-error'
-import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { Public } from '@/infra/auth/public'
 import { Roles } from '@/infra/auth/roles.decorator'
-import { ArchiveCatechistUseCase } from '@/domain/catechists/use-cases/archive-catechist.use-case'
-import { RestoreCatechistUseCase } from '@/domain/catechists/use-cases/restore-catechist.use-case'
-import { FetchArchivedCatechistsUseCase } from '@/domain/catechists/use-cases/fetch-archived-catechists.use-case'
 import { UserPayload } from '@/infra/auth/token.dto'
 import {
   BadRequestException,
@@ -34,9 +36,22 @@ import {
   Patch,
   Post,
   Put,
+  ServiceUnavailableException,
   UnauthorizedException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { CatechistPresenter } from '../presenters/catechist.presenter'
+
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024
+const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+interface UploadedImage {
+  buffer: Buffer
+  mimetype: string
+  size: number
+}
 
 @Controller('/catechists')
 export class CatechistController {
@@ -51,7 +66,9 @@ export class CatechistController {
     private resetCatechistPassword: ResetCatechistPasswordUseCase,
     private archiveCatechist: ArchiveCatechistUseCase,
     private restoreCatechist: RestoreCatechistUseCase,
-    private fetchArchivedCatechists: FetchArchivedCatechistsUseCase
+    private fetchArchivedCatechists: FetchArchivedCatechistsUseCase,
+    private updateCatechistAvatar: UpdateCatechistAvatarUseCase,
+    private avatarStorage: AvatarStorage
   ) {}
 
   @Post()
@@ -130,6 +147,58 @@ export class CatechistController {
         default:
           throw new NotFoundException(error.message)
       }
+    }
+  }
+
+  @Patch('/me/avatar')
+  @UseInterceptors(
+    FileInterceptor('file', { limits: { fileSize: MAX_AVATAR_SIZE } })
+  )
+  async changeAvatar(
+    @CurrentUser() user: UserPayload,
+    @UploadedFile() file?: UploadedImage
+  ) {
+    this.ensureAvatarStorageEnabled()
+
+    if (!file) {
+      throw new BadRequestException('Envie uma imagem no campo "file"')
+    }
+    if (!AVATAR_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException('A foto deve ser JPG, PNG ou WEBP')
+    }
+
+    const response = await this.updateCatechistAvatar.execute({
+      catechistId: user.sub,
+      file: { body: file.buffer, contentType: file.mimetype },
+    })
+
+    if (response.isLeft()) {
+      throw new NotFoundException()
+    }
+
+    return response.value
+  }
+
+  @Delete('/me/avatar')
+  @HttpCode(204)
+  async removeAvatar(@CurrentUser() user: UserPayload) {
+    this.ensureAvatarStorageEnabled()
+
+    const response = await this.updateCatechistAvatar.execute({
+      catechistId: user.sub,
+      file: null,
+    })
+
+    if (response.isLeft()) {
+      throw new NotFoundException()
+    }
+  }
+
+  private ensureAvatarStorageEnabled() {
+    if (!this.avatarStorage.isEnabled()) {
+      throw new ServiceUnavailableException(
+        'Upload de fotos não configurado no servidor'
+      )
     }
   }
 

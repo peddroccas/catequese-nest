@@ -41,6 +41,9 @@ model Catechist {
   // Preenchido quando o catequista vai para o arquivo
   archivedAt DateTime?
 
+  // URL pública da foto de perfil no Supabase Storage
+  avatarUrl String?
+
   @@map("catechists")
 }
 

@@ -4,6 +4,10 @@ export const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   JWT_SECRET: z.string(),
   PORT: z.coerce.number().optional().default(3333),
+  // Supabase Storage (fotos de perfil). Sem essas variáveis o upload fica desativado
+  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  SUPABASE_AVATAR_BUCKET: z.string().optional().default('avatars'),
 })
 
 export type EnvDTO = z.infer<typeof envSchema>
