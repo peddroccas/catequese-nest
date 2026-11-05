@@ -71,28 +71,11 @@ interface DetectedType {
   extension: string
 }
 
-// O tipo informado pelo navegador não é confiável: olha os primeiros bytes
+// Só PDF. O tipo informado pelo navegador não é confiável: todo PDF começa
+// com %PDF-, então olha os primeiros bytes
 function detectType(buffer: Buffer): DetectedType | null {
-  const head = buffer.subarray(0, 12)
-
-  if (head.subarray(0, 5).toString('latin1') === '%PDF-') {
+  if (buffer.subarray(0, 5).toString('latin1') === '%PDF-') {
     return { mimeType: 'application/pdf', extension: 'pdf' }
-  }
-  if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) {
-    return { mimeType: 'image/jpeg', extension: 'jpg' }
-  }
-  if (
-    head.subarray(0, 8).equals(
-      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
-    )
-  ) {
-    return { mimeType: 'image/png', extension: 'png' }
-  }
-  if (
-    head.subarray(0, 4).toString('latin1') === 'RIFF' &&
-    head.subarray(8, 12).toString('latin1') === 'WEBP'
-  ) {
-    return { mimeType: 'image/webp', extension: 'webp' }
   }
 
   return null
@@ -246,7 +229,7 @@ export class PublicRegistrationController {
       const type = detectType(file.buffer)
       if (!type) {
         throw new BadRequestException(
-          `${DOCUMENT_LABELS[kind]}: envie uma foto (JPG, PNG) ou um PDF`
+          `${DOCUMENT_LABELS[kind]}: envie o documento em PDF`
         )
       }
 

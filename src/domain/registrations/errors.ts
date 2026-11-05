@@ -13,6 +13,12 @@ export class RegistrationsClosedError extends Error implements UseCaseError {
   }
 }
 
+export class DocumentFileMissingError extends Error implements UseCaseError {
+  constructor() {
+    super('O arquivo deste documento não está mais no armazenamento')
+  }
+}
+
 export class SegmentClosedError extends Error implements UseCaseError {
   constructor() {
     super('As inscrições para esta etapa estão encerradas')

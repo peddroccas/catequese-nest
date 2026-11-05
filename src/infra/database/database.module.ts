@@ -20,6 +20,8 @@ import { PrismaRiteRepository } from './prisma/repositories/rite.repository'
 import { RiteRepository } from '@/domain/rites/repositories/rite.repository'
 import { PrismaRegistrationRepository } from './prisma/repositories/registration.repository'
 import { RegistrationRepository } from '@/domain/registrations/repositories/registration.repository'
+import { PrismaCatechizingDocumentRepository } from './prisma/repositories/catechizing-document.repository'
+import { CatechizingDocumentRepository } from '@/domain/catechizing-documents/repositories/catechizing-document.repository'
 
 @Global()
 @Module({
@@ -66,6 +68,10 @@ import { RegistrationRepository } from '@/domain/registrations/repositories/regi
       provide: RegistrationRepository,
       useClass: PrismaRegistrationRepository,
     },
+    {
+      provide: CatechizingDocumentRepository,
+      useClass: PrismaCatechizingDocumentRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -79,6 +85,7 @@ import { RegistrationRepository } from '@/domain/registrations/repositories/regi
     EntryRepository,
     RiteRepository,
     RegistrationRepository,
+    CatechizingDocumentRepository,
   ],
 })
 export class DatabaseModule {}

@@ -1,6 +1,15 @@
 import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { StorageObjectNotFoundError } from '@/core/errors/errors/storage-object-not-found-error'
 import { EnvDTO } from '../env/env'
+
+// O Supabase responde 400 com { error: 'not_found' } (ou 404) quando o arquivo não existe
+function isObjectNotFound(status: number, body: string) {
+  return (
+    status === 404 ||
+    (status === 400 && /not_found|Object not found/i.test(body))
+  )
+}
 
 // Base dos storages no Supabase Storage. Usa a API REST direto, sem o SDK.
 // Cada subclasse aponta para um bucket público
@@ -92,8 +101,13 @@ export abstract class SupabaseBucketStorage {
     )
 
     if (!response.ok) {
+      const text = await response.text()
+
+      if (isObjectNotFound(response.status, text)) {
+        throw new StorageObjectNotFoundError()
+      }
       throw new Error(
-        `Falha ao gerar o link do arquivo (${response.status}): ${await response.text()}`
+        `Falha ao gerar o link do arquivo (${response.status}): ${text}`
       )
     }
 
@@ -109,6 +123,9 @@ export abstract class SupabaseBucketStorage {
     )
 
     if (!response.ok) {
+      if (isObjectNotFound(response.status, await response.text())) {
+        throw new StorageObjectNotFoundError()
+      }
       throw new Error(`Falha ao baixar o arquivo (${response.status})`)
     }
 

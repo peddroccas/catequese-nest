@@ -25,6 +25,7 @@ import {
 import { RegistrationStatus } from '@/domain/registrations/enums/registration'
 import {
   ClassroomSegmentMismatchError,
+  DocumentFileMissingError,
   RegistrationNotPendingError,
 } from '@/domain/registrations/errors'
 import {
@@ -115,7 +116,11 @@ export class RegistrationController {
     })
 
     if (response.isLeft()) {
-      throw new NotFoundException('Documento não encontrado')
+      throw new NotFoundException(
+        response.value instanceof DocumentFileMissingError
+          ? 'O arquivo deste documento não está mais no armazenamento. Envie o documento de novo.'
+          : 'Documento não encontrado'
+      )
     }
 
     return { url: response.value.url }

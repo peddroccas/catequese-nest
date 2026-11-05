@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@/core/either'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
+import { StorageObjectNotFoundError } from '@/core/errors/errors/storage-object-not-found-error'
 import { Catechizing } from '@/domain/catechizings/entities/catechizing'
 import { Parent } from '@/domain/catechizings/entities/parent'
 import { MaritalStatus } from '@/domain/catechizings/enums/marital-status'
@@ -11,6 +12,7 @@ import { Classroom } from '@/domain/classroms/entities/classroom'
 import { ClassroomRepository } from '@/domain/classroms/repositories/classroom.repository'
 import {
   ClassroomSegmentMismatchError,
+  DocumentFileMissingError,
   DuplicatedRegistrationError,
   MissingDocumentsError,
   RegistrationNotPendingError,
@@ -208,7 +210,9 @@ export class GetRegistrationDocumentUrlUseCase {
   }: {
     registrationId: string
     fileId: string
-  }): Promise<Either<ResourceNotFoundError, { url: string }>> {
+  }): Promise<
+    Either<ResourceNotFoundError | DocumentFileMissingError, { url: string }>
+  > {
     const registration = await this.registrationRepository.findById(registrationId)
     const file = registration?.files.find(file => file.id === fileId)
 
@@ -216,12 +220,20 @@ export class GetRegistrationDocumentUrlUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    const url = await this.registrationStorage.createSignedUrl(
-      file.storagePath,
-      DOCUMENT_URL_TTL_SECONDS
-    )
+    try {
+      const url = await this.registrationStorage.createSignedUrl(
+        file.storagePath,
+        DOCUMENT_URL_TTL_SECONDS
+      )
 
-    return right({ url })
+      return right({ url })
+    } catch (error) {
+      // O banco lista o arquivo, mas ele não está mais no armazenamento
+      if (error instanceof StorageObjectNotFoundError) {
+        return left(new DocumentFileMissingError())
+      }
+      throw error
+    }
   }
 }
 
@@ -374,15 +386,32 @@ export class BuildRegistrationZipUseCase {
     }
 
     const entries: Record<string, Uint8Array> = {}
+    // Arquivo que não está mais no armazenamento não derruba o ZIP: entra um
+    // aviso no lugar, para a coordenação saber o que enviar de novo
     const downloads = await Promise.all(
-      registration.files.map(file => this.registrationStorage.download(file.storagePath))
+      registration.files.map(file =>
+        this.registrationStorage.download(file.storagePath).catch(error => {
+          if (error instanceof StorageObjectNotFoundError) {
+            return null
+          }
+          throw error
+        })
+      )
     )
 
     registration.files.forEach((file, index) => {
       const extension = EXTENSION_BY_MIME[file.mimeType] ?? 'bin'
       const label = toFileName(DOCUMENT_LABELS[file.kind])
+      const download = downloads[index]
 
-      entries[`${index + 1} - ${label}.${extension}`] = downloads[index]
+      if (download) {
+        entries[`${index + 1} - ${label}.${extension}`] = download
+      } else {
+        entries[`${index + 1} - AVISO arquivo ausente - ${label}.txt`] =
+          Buffer.from(
+            `O arquivo "${DOCUMENT_LABELS[file.kind]}" (${file.originalName}) não está mais no armazenamento. Envie o documento de novo.`
+          )
+      }
     })
 
     // Fotos e PDFs já são comprimidos: só empacota (level 0)

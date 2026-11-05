@@ -136,6 +136,25 @@ export class PrismaRegistrationRepository implements RegistrationRepository {
           },
         })
 
+        // Os documentos da inscrição passam para o perfil (só as linhas: os
+        // arquivos continuam onde estão no armazenamento)
+        const files = await tx.registrationFile.findMany({
+          where: { registrationId },
+        })
+        if (files.length) {
+          await tx.catechizingDocument.createMany({
+            data: files.map(file => ({
+              id: file.id,
+              kind: file.kind,
+              storagePath: file.storagePath,
+              originalName: file.originalName,
+              mimeType: file.mimeType,
+              sizeBytes: file.sizeBytes,
+              catechizingId: data.id,
+            })),
+          })
+        }
+
         // Só aprova se ainda estiver pendente (duas pessoas aprovando juntas)
         const updated = await tx.registration.updateMany({
           where: { id: registrationId, status: 'PENDING' },

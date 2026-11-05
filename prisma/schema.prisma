@@ -82,6 +82,8 @@ model Catechizing {
   carnePayments      CashEntry[]
   // Inscrição pública de onde ele veio (com os documentos enviados)
   registration       Registration?
+  // Documentos (RG, certidões...) guardados pela coordenação
+  documents          CatechizingDocument[]
 
   // Preenchido quando o catequizando vai para o arquivo
   archivedAt DateTime?
@@ -389,4 +391,27 @@ model RegistrationSettings {
   updatedAt    DateTime @updatedAt
 
   @@map("registration_settings")
+}
+
+// Documento do catequizando (RG, certidões, lembranças...), no mesmo bucket
+// privado das inscrições. Só a coordenação vê e altera. Ao aprovar uma
+// inscrição, os documentos dela passam para cá; quem foi cadastrado à mão
+// ganha os documentos pela coordenação. Um por tipo (enviar de novo troca)
+model CatechizingDocument {
+  id           String                   @id @default(uuid())
+  kind         RegistrationDocumentKind
+  // Caminho dentro do bucket; nunca sai da API
+  storagePath  String
+  // Nome original (só para exibir)
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+
+  catechizing   Catechizing @relation(fields: [catechizingId], references: [id], onDelete: Cascade)
+  catechizingId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([catechizingId, kind])
+  @@map("catechizing_documents")
 }
