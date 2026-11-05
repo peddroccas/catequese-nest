@@ -15,6 +15,12 @@ async function bootstrap() {
 
   const config = app.get<ConfigService<EnvDTO, true>>(ConfigService)
 
+  // req.ip passa a ser o IP real de quem chamou, não o do proxy da hospedagem
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .set('trust proxy', config.get('TRUST_PROXY_HOPS', { infer: true }))
+
   await app.listen(config.get('PORT', { infer: true }))
 }
 bootstrap()

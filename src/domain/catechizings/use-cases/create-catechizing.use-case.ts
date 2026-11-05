@@ -31,6 +31,9 @@ export class CreateCatechizingUseCase {
     maritalStatus,
     livesWithPartner,
     hasReceivedMarriage,
+    shirtSize,
+    foodRestriction,
+    pickupAuthorizedBy,
     parents,
   }: CreateCatechizingRequestDto): Promise<CreateCatechizingResponseDto> {
     const classroom = await this.classroomRepository.findById(classroomId)
@@ -63,6 +66,9 @@ export class CreateCatechizingUseCase {
           : null,
         maritalStatus: isAdult ? (maritalStatus ?? null) : null,
         livesWithPartner: isAdult ? (livesWithPartner ?? null) : null,
+        shirtSize: shirtSize || null,
+        foodRestriction: foodRestriction || null,
+        pickupAuthorizedBy: pickupAuthorizedBy || null,
         classroomId: classroom.id,
         parents: parents.map(parent =>
           Parent.create({

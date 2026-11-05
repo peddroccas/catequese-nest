@@ -35,10 +35,11 @@ model Catechist {
   email         String @unique
   password_hash String
 
-  classrooms           Classroom[]
-  formationAttendances FormationAttendance[]
-  expensesCreated      Expense[]
-  entriesCreated       CashEntry[]
+  classrooms            Classroom[]
+  formationAttendances  FormationAttendance[]
+  expensesCreated       Expense[]
+  entriesCreated        CashEntry[]
+  registrationsReviewed Registration[]
 
   // Preenchido quando o catequista vai para o arquivo
   archivedAt DateTime?
@@ -66,6 +67,12 @@ model Catechizing {
   hasReceivedEucharist Boolean
   hasReceivedMarriage  Boolean @default(false)
 
+  // Vêm da ficha de inscrição
+  shirtSize          String?
+  foodRestriction    String?
+  // Quem pode buscar o catequizando quando ele não vai embora sozinho
+  pickupAuthorizedBy String?
+
   parents Parent[]
 
   classroom   Classroom? @relation(fields: [classroomId], references: [id], onDelete: Cascade)
@@ -73,6 +80,8 @@ model Catechizing {
 
   meetingAttendances MeetingAttendance[]
   carnePayments      CashEntry[]
+  // Inscrição pública de onde ele veio (com os documentos enviados)
+  registration       Registration?
 
   // Preenchido quando o catequizando vai para o arquivo
   archivedAt DateTime?
@@ -248,7 +257,7 @@ model CashEntry {
 
 // Rito da catequese (ex.: apresentação, entrega do Creio) com o PDF do roteiro
 model Rite {
-  id          String  @id @default(uuid())
+  id          String     @id @default(uuid())
   name        String
   description String?
   // PDFs do rito (um rito pode ter mais de um, ex.: roteiro e folder)
@@ -274,4 +283,107 @@ model RiteFile {
 
   @@index([riteId])
   @@map("rite_files")
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum RegistrationDocumentKind {
+  // Certidão de nascimento ou RG de quem vai fazer a catequese
+  PERSON_ID
+  // RG/CNH do responsável (só quem é menor de idade)
+  GUARDIAN_ID
+  PROOF_OF_RESIDENCE
+  BAPTISM
+  EUCHARIST
+  // Certidão de casamento no religioso (só adultos)
+  MARRIAGE
+}
+
+// Inscrição enviada pelo formulário público (sem login). A coordenação confere
+// e, ao aprovar, ela vira um catequizando na turma escolhida
+model Registration {
+  id String @id @default(uuid())
+
+  // Etapa escolhida: PRE_EUCARISTIA, EUCARISTIA, CRISMA ou ADULTOS
+  segment String
+  status  RegistrationStatus @default(PENDING)
+
+  name                    String
+  birthday                DateTime @db.Date
+  address                 String
+  personWithSpecialNeeds  Boolean
+  specialNeedsDescription String?
+  foodRestriction         String?
+  releasedToGoAwayAlone   Boolean  @default(false)
+  pickupAuthorizedBy      String?
+  shirtSize               String?
+
+  hasReceivedBaptism   Boolean
+  hasReceivedEucharist Boolean
+  hasReceivedMarriage  Boolean @default(false)
+
+  // Só adultos
+  maritalStatus    String?
+  livesWithPartner Boolean?
+
+  // [{ name, phone, kinship }]; para adultos, o próprio inscrito
+  parents Json
+
+  files RegistrationFile[]
+
+  // Resposta da coordenação
+  rejectionReason String?
+  reviewedAt      DateTime?
+  reviewedBy      Catechist? @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedById    String?
+
+  // Preenchido ao aprovar
+  catechizing   Catechizing? @relation(fields: [catechizingId], references: [id], onDelete: SetNull)
+  catechizingId String?      @unique
+
+  // Quando a família marcou que leu e concorda com o termo de compromisso
+  termsAcceptedAt DateTime
+
+  // Hash do IP de quem enviou (para rastrear abuso sem guardar o IP)
+  submitterHash String?
+  createdAt     DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@index([name, birthday])
+  @@map("registrations")
+}
+
+// Documento enviado na inscrição. Fica num bucket privado do Supabase: o
+// caminho nunca sai da API, a coordenação abre por link temporário
+model RegistrationFile {
+  id           String                   @id @default(uuid())
+  kind         RegistrationDocumentKind
+  // Caminho dentro do bucket
+  storagePath  String
+  // Nome original (só para exibir)
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  registrationId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([registrationId, kind])
+  @@map("registration_files")
+}
+
+// Liga e desliga o formulário público de inscrição. Uma linha só (id 1);
+// sem linha, as inscrições estão fechadas
+model RegistrationSettings {
+  id        Int      @id @default(1)
+  isOpen    Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+
+  @@map("registration_settings")
 }

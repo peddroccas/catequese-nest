@@ -56,6 +56,18 @@ export class UpdateCatechizingRequestDto {
   @IsBoolean()
   livesWithPartner?: boolean
 
+  @IsOptional()
+  @IsString()
+  shirtSize?: string
+
+  @IsOptional()
+  @IsString()
+  foodRestriction?: string
+
+  @IsOptional()
+  @IsString()
+  pickupAuthorizedBy?: string
+
   @IsArray()
   @ValidateNested({ each: true }) // Valida cada item do array
   @Type(() => UpdateParentRequestDto) // Converte para a classe ParentDto

@@ -27,6 +27,9 @@ export class CatechizingMapper {
         maritalStatus: raw.maritalStatus as MaritalStatus | null,
         livesWithPartner: raw.livesWithPartner,
         archivedAt: raw.archivedAt,
+        shirtSize: raw.shirtSize,
+        foodRestriction: raw.foodRestriction,
+        pickupAuthorizedBy: raw.pickupAuthorizedBy,
       },
       new UniqueEntityID(raw.id)
     )
@@ -50,6 +53,9 @@ export class CatechizingMapper {
       specialNeedsDescription: catechizing.specialNeedsDescription,
       maritalStatus: catechizing.maritalStatus,
       livesWithPartner: catechizing.livesWithPartner,
+      shirtSize: catechizing.shirtSize,
+      foodRestriction: catechizing.foodRestriction,
+      pickupAuthorizedBy: catechizing.pickupAuthorizedBy,
     }
   }
 }

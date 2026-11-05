@@ -5,6 +5,7 @@ import { ClassroomModule } from './classrooms/classroom.module'
 import { FinanceModule } from './finances/finance.module'
 import { FormationModule } from './formations/formation.module'
 import { MeetingModule } from './meetings/meeting.module'
+import { RegistrationModule } from './registrations/registration.module'
 import { RiteModule } from './rites/rite.module'
 
 @Module({
@@ -16,6 +17,7 @@ import { RiteModule } from './rites/rite.module'
     FormationModule,
     MeetingModule,
     RiteModule,
+    RegistrationModule,
   ],
 })
 export class HttpModule {}

@@ -33,6 +33,9 @@ export class UpdateCatechizingUseCase {
     hasReceivedEucharist,
     parents,
     hasReceivedMarriage,
+    shirtSize,
+    foodRestriction,
+    pickupAuthorizedBy,
   }: UpdateCatechizingRequestDto): Promise<UpdateCatechizingResponseDto> {
     const currentCatechizing = await this.catechizingRepository.findById(id)
 
@@ -80,6 +83,19 @@ export class UpdateCatechizingUseCase {
           : null,
         maritalStatus: isAdult ? (maritalStatus ?? null) : null,
         livesWithPartner: isAdult ? (livesWithPartner ?? null) : null,
+        // Se o campo não veio no corpo, mantém o que já estava salvo
+        shirtSize:
+          shirtSize === undefined
+            ? currentCatechizing.shirtSize
+            : shirtSize || null,
+        foodRestriction:
+          foodRestriction === undefined
+            ? currentCatechizing.foodRestriction
+            : foodRestriction || null,
+        pickupAuthorizedBy:
+          pickupAuthorizedBy === undefined
+            ? currentCatechizing.pickupAuthorizedBy
+            : pickupAuthorizedBy || null,
         classroomId: classroom.id,
         parents: parents.map(parent =>
           Parent.create(

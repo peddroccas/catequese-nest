@@ -20,6 +20,11 @@ export interface CatechizingProps {
   hasReceivedEucharist: boolean
   hasReceivedMarriage: boolean
 
+  // Vêm da ficha de inscrição
+  shirtSize?: string | null
+  foodRestriction?: string | null
+  pickupAuthorizedBy?: string | null
+
   classroomId: UniqueEntityID
   parents: Parent[]
 }
@@ -51,6 +56,18 @@ export class Catechizing extends Entity<CatechizingProps> {
 
   get hasReceivedMarriage(): boolean {
     return this.props.hasReceivedMarriage
+  }
+
+  get shirtSize(): string | null {
+    return this.props.shirtSize ?? null
+  }
+
+  get foodRestriction(): string | null {
+    return this.props.foodRestriction ?? null
+  }
+
+  get pickupAuthorizedBy(): string | null {
+    return this.props.pickupAuthorizedBy ?? null
   }
 
   get parents(): Parent[] {

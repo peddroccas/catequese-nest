@@ -11,7 +11,7 @@ export abstract class SupabaseBucketStorage {
 
   protected constructor(
     config: ConfigService<EnvDTO, true>,
-    private readonly bucket: string
+    protected readonly bucket: string
   ) {
     this.url = config.get('SUPABASE_URL', { infer: true })?.replace(/\/$/, '')
     this.key = config.get('SUPABASE_SERVICE_ROLE_KEY', { infer: true })
@@ -74,6 +74,55 @@ export abstract class SupabaseBucketStorage {
 
     if (!response.ok) {
       this.logger.warn(`Não foi possível apagar ${url} (${response.status})`)
+    }
+  }
+
+  // Para buckets privados: o arquivo só abre por link temporário assinado
+  protected async signObject(
+    path: string,
+    expiresInSeconds: number
+  ): Promise<string> {
+    const response = await fetch(
+      `${this.url}/storage/v1/object/sign/${this.bucket}/${path}`,
+      {
+        method: 'POST',
+        headers: { ...this.authHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ expiresIn: expiresInSeconds }),
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(
+        `Falha ao gerar o link do arquivo (${response.status}): ${await response.text()}`
+      )
+    }
+
+    const { signedURL } = (await response.json()) as { signedURL: string }
+
+    return `${this.url}/storage/v1${signedURL}`
+  }
+
+  protected async downloadObject(path: string): Promise<Buffer> {
+    const response = await fetch(
+      `${this.url}/storage/v1/object/${this.bucket}/${path}`,
+      { headers: this.authHeaders() }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Falha ao baixar o arquivo (${response.status})`)
+    }
+
+    return Buffer.from(await response.arrayBuffer())
+  }
+
+  protected async deleteObjectByPath(path: string): Promise<void> {
+    const response = await fetch(
+      `${this.url}/storage/v1/object/${this.bucket}/${path}`,
+      { method: 'DELETE', headers: this.authHeaders() }
+    )
+
+    if (!response.ok) {
+      this.logger.warn(`Não foi possível apagar ${path} (${response.status})`)
     }
   }
 }

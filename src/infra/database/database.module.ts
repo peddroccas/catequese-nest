@@ -18,6 +18,8 @@ import { PrismaEntryRepository } from './prisma/repositories/entry.repository'
 import { EntryRepository } from '@/domain/finances/repositories/entry.repository'
 import { PrismaRiteRepository } from './prisma/repositories/rite.repository'
 import { RiteRepository } from '@/domain/rites/repositories/rite.repository'
+import { PrismaRegistrationRepository } from './prisma/repositories/registration.repository'
+import { RegistrationRepository } from '@/domain/registrations/repositories/registration.repository'
 
 @Global()
 @Module({
@@ -60,6 +62,10 @@ import { RiteRepository } from '@/domain/rites/repositories/rite.repository'
       provide: RiteRepository,
       useClass: PrismaRiteRepository,
     },
+    {
+      provide: RegistrationRepository,
+      useClass: PrismaRegistrationRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -72,6 +78,7 @@ import { RiteRepository } from '@/domain/rites/repositories/rite.repository'
     ExpenseRepository,
     EntryRepository,
     RiteRepository,
+    RegistrationRepository,
   ],
 })
 export class DatabaseModule {}

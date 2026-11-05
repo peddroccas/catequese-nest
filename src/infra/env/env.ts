@@ -10,6 +10,11 @@ export const envSchema = z.object({
   SUPABASE_AVATAR_BUCKET: z.string().optional().default('avatars'),
   // PDFs dos ritos (bucket público, criado no painel do Supabase)
   SUPABASE_RITES_BUCKET: z.string().optional().default('rites'),
+  // Documentos das inscrições (RG, certidões...): bucket PRIVADO
+  SUPABASE_REGISTRATIONS_BUCKET: z.string().optional().default('registrations'),
+  // Quantos proxies existem na frente da API (Render, Railway...). A inscrição
+  // pública limita envios por IP e precisa do IP real de quem enviou
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).optional().default(1),
 })
 
 export type EnvDTO = z.infer<typeof envSchema>
