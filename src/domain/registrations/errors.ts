@@ -13,6 +13,12 @@ export class RegistrationsClosedError extends Error implements UseCaseError {
   }
 }
 
+export class SegmentClosedError extends Error implements UseCaseError {
+  constructor() {
+    super('As inscrições para esta etapa estão encerradas')
+  }
+}
+
 export class DuplicatedRegistrationError extends Error implements UseCaseError {
   constructor() {
     super('Já existe uma inscrição para este nome e data de nascimento')

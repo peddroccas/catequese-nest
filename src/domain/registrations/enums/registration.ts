@@ -12,6 +12,8 @@ export enum RegistrationSegment {
 
 // Inscrição nova só entra no primeiro ano (Eucaristia 1 e Crisma 1): as turmas
 // "2" são de quem já está na catequese e continua para o segundo ano
+export const ALL_REGISTRATION_SEGMENTS = Object.values(RegistrationSegment)
+
 export const SEGMENT_CLASSROOMS: Record<RegistrationSegment, Segment[]> = {
   [RegistrationSegment.PRE_EUCARISTIA]: [Segment.PRE_EUCARISTIA],
   [RegistrationSegment.EUCARISTIA]: [Segment.EUCARISTIA_1],

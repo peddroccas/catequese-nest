@@ -1,13 +1,20 @@
 import { Injectable } from '@nestjs/common'
 import { Catechizing } from '@/domain/catechizings/entities/catechizing'
-import { NewRegistration, Registration } from '../entities/registration'
+import {
+  NewRegistration,
+  Registration,
+  RegistrationSettings,
+} from '../entities/registration'
 import { RegistrationStatus } from '../enums/registration'
 
 @Injectable()
 export abstract class RegistrationRepository {
-  // Formulário público aberto ou fechado (fechado até a coordenação abrir)
-  abstract isOpen(): Promise<boolean>
-  abstract setOpen(isOpen: boolean): Promise<void>
+  // Fechado até a coordenação abrir; por padrão, todas as etapas recebem
+  abstract getSettings(): Promise<RegistrationSettings>
+  // Muda só o que vier (abrir/fechar e/ou as etapas)
+  abstract updateSettings(
+    changes: Partial<RegistrationSettings>
+  ): Promise<RegistrationSettings>
   abstract create(registration: NewRegistration): Promise<void>
   abstract findById(id: string): Promise<Registration | null>
   abstract findMany(status?: RegistrationStatus): Promise<Registration[]>

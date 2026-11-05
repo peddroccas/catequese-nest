@@ -15,12 +15,14 @@ import {
   MissingDocumentsError,
   RegistrationNotPendingError,
   RegistrationsClosedError,
+  SegmentClosedError,
 } from '../errors'
 import {
   NewRegistration,
   Registration,
   RegistrationData,
   RegistrationFile,
+  RegistrationSettings,
 } from '../entities/registration'
 import {
   DOCUMENT_LABELS,
@@ -61,14 +63,20 @@ export class SubmitRegistrationUseCase {
   }): Promise<
     Either<
       | RegistrationsClosedError
+      | SegmentClosedError
       | MissingDocumentsError
       | DuplicatedRegistrationError,
       { registrationId: string }
     >
   > {
-    // A coordenação pode fechar o formulário a qualquer momento
-    if (!(await this.registrationRepository.isOpen())) {
+    // A coordenação pode fechar tudo, ou só algumas etapas, a qualquer momento
+    const settings = await this.registrationRepository.getSettings()
+
+    if (!settings.isOpen) {
       return left(new RegistrationsClosedError())
+    }
+    if (!settings.openSegments.includes(data.segment)) {
+      return left(new SegmentClosedError())
     }
 
     // Só os documentos que a ficha exige: sacramento não marcado não tem arquivo
@@ -138,19 +146,21 @@ export class SubmitRegistrationUseCase {
 export class GetRegistrationSettingsUseCase {
   constructor(private registrationRepository: RegistrationRepository) {}
 
-  async execute(): Promise<Either<null, { isOpen: boolean }>> {
-    return right({ isOpen: await this.registrationRepository.isOpen() })
+  async execute(): Promise<Either<null, { settings: RegistrationSettings }>> {
+    return right({ settings: await this.registrationRepository.getSettings() })
   }
 }
 
 @Injectable()
-export class SetRegistrationsOpenUseCase {
+export class UpdateRegistrationSettingsUseCase {
   constructor(private registrationRepository: RegistrationRepository) {}
 
-  async execute(isOpen: boolean): Promise<Either<null, { isOpen: boolean }>> {
-    await this.registrationRepository.setOpen(isOpen)
+  async execute(
+    changes: Partial<RegistrationSettings>
+  ): Promise<Either<null, { settings: RegistrationSettings }>> {
+    const settings = await this.registrationRepository.updateSettings(changes)
 
-    return right({ isOpen })
+    return right({ settings })
   }
 }
 

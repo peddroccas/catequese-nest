@@ -381,9 +381,12 @@ model RegistrationFile {
 // Liga e desliga o formulário público de inscrição. Uma linha só (id 1);
 // sem linha, as inscrições estão fechadas
 model RegistrationSettings {
-  id        Int      @id @default(1)
-  isOpen    Boolean  @default(false)
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(1)
+  isOpen       Boolean  @default(false)
+  // Etapas que recebem inscrição (valores de RegistrationSegment). Só valem
+  // com isOpen ligado; por padrão todas
+  openSegments String[] @default(["PRE_EUCARISTIA", "EUCARISTIA", "CRISMA", "ADULTOS"])
+  updatedAt    DateTime @updatedAt
 
   @@map("registration_settings")
 }

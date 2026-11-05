@@ -20,7 +20,7 @@ import { CatechizingPresenter } from '@/infra/http/catechizings/presenters/catec
 import {
   ApproveRegistrationRequestDto,
   RejectRegistrationRequestDto,
-  SetRegistrationsOpenRequestDto,
+  UpdateRegistrationSettingsRequestDto,
 } from '@/domain/registrations/dtos/registration-review.dto'
 import { RegistrationStatus } from '@/domain/registrations/enums/registration'
 import {
@@ -35,7 +35,7 @@ import {
   GetRegistrationDocumentUrlUseCase,
   GetRegistrationSettingsUseCase,
   RejectRegistrationUseCase,
-  SetRegistrationsOpenUseCase,
+  UpdateRegistrationSettingsUseCase,
 } from '@/domain/registrations/use-cases/registration.use-cases'
 import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { Roles } from '@/infra/auth/roles.decorator'
@@ -50,7 +50,7 @@ export class RegistrationController {
     private fetchRegistrations: FetchRegistrationsUseCase,
     private fetchByCatechizing: FetchRegistrationByCatechizingUseCase,
     private getSettings: GetRegistrationSettingsUseCase,
-    private setOpen: SetRegistrationsOpenUseCase,
+    private updateSettingsUseCase: UpdateRegistrationSettingsUseCase,
     private getDocumentUrl: GetRegistrationDocumentUrlUseCase,
     private buildZip: BuildRegistrationZipUseCase,
     private approveRegistration: ApproveRegistrationUseCase,
@@ -74,15 +74,19 @@ export class RegistrationController {
   async settings() {
     const response = await this.getSettings.execute()
 
-    return { isOpen: response.value!.isOpen }
+    return response.value!.settings
   }
 
-  // Abre ou fecha o formulário público
+  // Abre/fecha o formulário público e escolhe as etapas que recebem inscrição
+  // (só muda o que vier no corpo)
   @Put('/settings')
-  async updateSettings(@Body() dto: SetRegistrationsOpenRequestDto) {
-    const response = await this.setOpen.execute(dto.isOpen)
+  async updateSettings(@Body() dto: UpdateRegistrationSettingsRequestDto) {
+    const response = await this.updateSettingsUseCase.execute({
+      isOpen: dto.isOpen,
+      openSegments: dto.openSegments,
+    })
 
-    return { isOpen: response.value!.isOpen }
+    return response.value!.settings
   }
 
   // Inscrição (com os documentos) de onde veio o catequizando

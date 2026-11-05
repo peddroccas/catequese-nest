@@ -7,7 +7,7 @@ import {
   GetRegistrationDocumentUrlUseCase,
   GetRegistrationSettingsUseCase,
   RejectRegistrationUseCase,
-  SetRegistrationsOpenUseCase,
+  UpdateRegistrationSettingsUseCase,
   SubmitRegistrationUseCase,
 } from '@/domain/registrations/use-cases/registration.use-cases'
 import { PublicRegistrationController } from './controllers/public-registration.controller'
@@ -24,7 +24,7 @@ import {
     FetchRegistrationsUseCase,
     FetchRegistrationByCatechizingUseCase,
     GetRegistrationSettingsUseCase,
-    SetRegistrationsOpenUseCase,
+    UpdateRegistrationSettingsUseCase,
     GetRegistrationDocumentUrlUseCase,
     BuildRegistrationZipUseCase,
     ApproveRegistrationUseCase,

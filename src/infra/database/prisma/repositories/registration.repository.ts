@@ -2,8 +2,13 @@ import { Catechizing } from '@/domain/catechizings/entities/catechizing'
 import {
   NewRegistration,
   Registration,
+  RegistrationSettings,
 } from '@/domain/registrations/entities/registration'
-import { RegistrationStatus } from '@/domain/registrations/enums/registration'
+import {
+  ALL_REGISTRATION_SEGMENTS,
+  RegistrationSegment,
+  RegistrationStatus,
+} from '@/domain/registrations/enums/registration'
 import { RegistrationRepository } from '@/domain/registrations/repositories/registration.repository'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
@@ -24,20 +29,31 @@ const SETTINGS_ID = 1
 export class PrismaRegistrationRepository implements RegistrationRepository {
   constructor(private db: PrismaService) {}
 
-  async isOpen(): Promise<boolean> {
+  async getSettings(): Promise<RegistrationSettings> {
     const settings = await this.db.registrationSettings.findUnique({
       where: { id: SETTINGS_ID },
     })
 
-    return settings?.isOpen ?? false
+    return {
+      isOpen: settings?.isOpen ?? false,
+      openSegments: (settings?.openSegments ??
+        ALL_REGISTRATION_SEGMENTS) as RegistrationSegment[],
+    }
   }
 
-  async setOpen(isOpen: boolean): Promise<void> {
-    await this.db.registrationSettings.upsert({
+  async updateSettings(
+    changes: Partial<RegistrationSettings>
+  ): Promise<RegistrationSettings> {
+    const settings = await this.db.registrationSettings.upsert({
       where: { id: SETTINGS_ID },
-      create: { id: SETTINGS_ID, isOpen },
-      update: { isOpen },
+      create: { id: SETTINGS_ID, ...changes },
+      update: changes,
     })
+
+    return {
+      isOpen: settings.isOpen,
+      openSegments: settings.openSegments as RegistrationSegment[],
+    }
   }
 
   async create({ files, parents, ...data }: NewRegistration): Promise<void> {

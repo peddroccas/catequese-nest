@@ -28,6 +28,7 @@ import {
   DuplicatedRegistrationError,
   MissingDocumentsError,
   RegistrationsClosedError,
+  SegmentClosedError,
 } from '@/domain/registrations/errors'
 import { RegistrationStorage } from '@/domain/registrations/storage/registration-storage'
 import {
@@ -128,9 +129,11 @@ export class PublicRegistrationController {
   @Get('/status')
   @UseGuards(RegistrationStatusRateLimitGuard)
   async status() {
-    const response = await this.getSettings.execute()
+    const { settings } = (await this.getSettings.execute()).value!
+    // Sem nenhuma etapa aberta, para quem vê é como se estivesse tudo fechado
+    const isOpen = settings.isOpen && settings.openSegments.length > 0
 
-    return { isOpen: response.value!.isOpen }
+    return { isOpen, openSegments: isOpen ? settings.openSegments : [] }
   }
 
   @Post()
@@ -201,7 +204,10 @@ export class PublicRegistrationController {
       if (response.isLeft()) {
         const error = response.value
 
-        if (error instanceof RegistrationsClosedError) {
+        if (
+          error instanceof RegistrationsClosedError ||
+          error instanceof SegmentClosedError
+        ) {
           throw new ForbiddenException(error.message)
         }
         if (error instanceof MissingDocumentsError) {

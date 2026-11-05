@@ -1,4 +1,15 @@
-import { IsBoolean, IsString, IsUUID, MaxLength, MinLength } from 'class-validator'
+import {
+  ArrayUnique,
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator'
+import { RegistrationSegment } from '../enums/registration'
 
 export class ApproveRegistrationRequestDto {
   @IsUUID()
@@ -12,7 +23,15 @@ export class RejectRegistrationRequestDto {
   reason: string
 }
 
-export class SetRegistrationsOpenRequestDto {
+// Muda só o que vier: abrir/fechar tudo e/ou escolher as etapas
+export class UpdateRegistrationSettingsRequestDto {
+  @IsOptional()
   @IsBoolean()
-  isOpen: boolean
+  isOpen?: boolean
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsEnum(RegistrationSegment, { each: true })
+  openSegments?: RegistrationSegment[]
 }

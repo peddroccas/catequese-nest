@@ -4,6 +4,12 @@ import {
   RegistrationStatus,
 } from '../enums/registration'
 
+// Liga/desliga o formulário público e escolhe as etapas que recebem inscrição
+export interface RegistrationSettings {
+  isOpen: boolean
+  openSegments: RegistrationSegment[]
+}
+
 export interface RegistrationParent {
   name: string
   phone: string
