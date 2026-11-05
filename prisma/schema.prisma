@@ -37,6 +37,8 @@ model Catechist {
 
   classrooms           Classroom[]
   formationAttendances FormationAttendance[]
+  expensesCreated      Expense[]
+  entriesCreated       CashEntry[]
 
   // Preenchido quando o catequista vai para o arquivo
   archivedAt DateTime?
@@ -70,6 +72,7 @@ model Catechizing {
   classroomId String
 
   meetingAttendances MeetingAttendance[]
+  carnePayments      CashEntry[]
 
   // Preenchido quando o catequizando vai para o arquivo
   archivedAt DateTime?
@@ -181,4 +184,64 @@ model MeetingAttendance {
 
   @@unique([meetingId, catechizingId])
   @@map("meeting_attendances")
+}
+
+enum PaymentMethod {
+  PIX
+  CASH
+  CARD
+}
+
+enum EntrySource {
+  // Ajuda dos catequistas ao caixa
+  COLLABORATION
+  // Pagamento do carnê de um catequizando
+  CARNE
+  DONATION
+  // Valor pago pela paróquia
+  PARISH
+}
+
+// Saída do caixa: o que foi gasto e com o quê
+model Expense {
+  id            String        @id @default(uuid())
+  // Destinação: com o que foi gasto
+  description   String
+  // Valores em centavos, para não ter erro de arredondamento
+  amountCents   Int
+  date          DateTime      @db.Date
+  paymentMethod PaymentMethod
+
+  // Quem registrou (fica vazio se o catequista for apagado)
+  createdBy   Catechist? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdAt   DateTime   @default(now())
+
+  @@index([date])
+  @@map("expenses")
+}
+
+// Entrada no caixa. Pagamentos do carnê são entradas de origem CARNE
+// ligadas ao catequizando
+model CashEntry {
+  id            String        @id @default(uuid())
+  source        EntrySource
+  amountCents   Int
+  date          DateTime      @db.Date
+  paymentMethod PaymentMethod
+  // Quem pagou/doou/colaborou (obrigatório no carnê)
+  payerName     String?
+  description   String?
+
+  // Só no carnê. O pagamento continua no caixa se o catequizando for apagado
+  catechizing   Catechizing? @relation(fields: [catechizingId], references: [id], onDelete: SetNull)
+  catechizingId String?
+
+  createdBy   Catechist? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdAt   DateTime   @default(now())
+
+  @@index([date])
+  @@index([catechizingId])
+  @@map("cash_entries")
 }

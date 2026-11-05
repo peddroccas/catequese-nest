@@ -12,6 +12,10 @@ import { PrismaMeetingRepository } from './prisma/repositories/meeting.repositor
 import { MeetingRepository } from '@/domain/meetings/repositories/meeting.repository'
 import { PrismaMeetingThemeRepository } from './prisma/repositories/meeting-theme.repository'
 import { MeetingThemeRepository } from '@/domain/meetings/repositories/meeting-theme.repository'
+import { PrismaExpenseRepository } from './prisma/repositories/expense.repository'
+import { ExpenseRepository } from '@/domain/finances/repositories/expense.repository'
+import { PrismaEntryRepository } from './prisma/repositories/entry.repository'
+import { EntryRepository } from '@/domain/finances/repositories/entry.repository'
 
 @Global()
 @Module({
@@ -42,6 +46,14 @@ import { MeetingThemeRepository } from '@/domain/meetings/repositories/meeting-t
       provide: MeetingThemeRepository,
       useClass: PrismaMeetingThemeRepository,
     },
+    {
+      provide: ExpenseRepository,
+      useClass: PrismaExpenseRepository,
+    },
+    {
+      provide: EntryRepository,
+      useClass: PrismaEntryRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -51,6 +63,8 @@ import { MeetingThemeRepository } from '@/domain/meetings/repositories/meeting-t
     FormationRepository,
     MeetingRepository,
     MeetingThemeRepository,
+    ExpenseRepository,
+    EntryRepository,
   ],
 })
 export class DatabaseModule {}
