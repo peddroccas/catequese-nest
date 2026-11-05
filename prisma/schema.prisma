@@ -245,3 +245,33 @@ model CashEntry {
   @@index([catechizingId])
   @@map("cash_entries")
 }
+
+// Rito da catequese (ex.: apresentação, entrega do Creio) com o PDF do roteiro
+model Rite {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  // PDFs do rito (um rito pode ter mais de um, ex.: roteiro e folder)
+  files       RiteFile[]
+
+  createdAt DateTime @default(now())
+
+  @@map("rites")
+}
+
+// PDF anexado a um rito. A URL é pública: no Supabase Storage ou, nos ritos
+// que já existiam, um caminho do próprio app (/ritos/...)
+model RiteFile {
+  id   String @id @default(uuid())
+  // Nome original do arquivo
+  name String
+  url  String
+
+  rite   Rite   @relation(fields: [riteId], references: [id], onDelete: Cascade)
+  riteId String
+
+  createdAt DateTime @default(now())
+
+  @@index([riteId])
+  @@map("rite_files")
+}

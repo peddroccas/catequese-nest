@@ -5,6 +5,7 @@ import { ClassroomModule } from './classrooms/classroom.module'
 import { FinanceModule } from './finances/finance.module'
 import { FormationModule } from './formations/formation.module'
 import { MeetingModule } from './meetings/meeting.module'
+import { RiteModule } from './rites/rite.module'
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MeetingModule } from './meetings/meeting.module'
     FinanceModule,
     FormationModule,
     MeetingModule,
+    RiteModule,
   ],
 })
 export class HttpModule {}

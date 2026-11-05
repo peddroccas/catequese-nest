@@ -16,6 +16,8 @@ import { PrismaExpenseRepository } from './prisma/repositories/expense.repositor
 import { ExpenseRepository } from '@/domain/finances/repositories/expense.repository'
 import { PrismaEntryRepository } from './prisma/repositories/entry.repository'
 import { EntryRepository } from '@/domain/finances/repositories/entry.repository'
+import { PrismaRiteRepository } from './prisma/repositories/rite.repository'
+import { RiteRepository } from '@/domain/rites/repositories/rite.repository'
 
 @Global()
 @Module({
@@ -54,6 +56,10 @@ import { EntryRepository } from '@/domain/finances/repositories/entry.repository
       provide: EntryRepository,
       useClass: PrismaEntryRepository,
     },
+    {
+      provide: RiteRepository,
+      useClass: PrismaRiteRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -65,6 +71,7 @@ import { EntryRepository } from '@/domain/finances/repositories/entry.repository
     MeetingThemeRepository,
     ExpenseRepository,
     EntryRepository,
+    RiteRepository,
   ],
 })
 export class DatabaseModule {}

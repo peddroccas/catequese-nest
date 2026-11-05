@@ -8,6 +8,8 @@ export const envSchema = z.object({
   SUPABASE_URL: z.string().url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   SUPABASE_AVATAR_BUCKET: z.string().optional().default('avatars'),
+  // PDFs dos ritos (bucket público, criado no painel do Supabase)
+  SUPABASE_RITES_BUCKET: z.string().optional().default('rites'),
 })
 
 export type EnvDTO = z.infer<typeof envSchema>
